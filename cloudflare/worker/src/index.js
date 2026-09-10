@@ -52,7 +52,7 @@ export class OxigraphContainer extends Container {
  * else is a 404 — including non-canonical spellings of these same paths; see
  * ./http.js for why that matters.
  */
-const QUERY_PATHS = new Set(["/sparql", "/query"]);
+const QUERY_PATHS = new Set(["/sparql"]);
 const PAGE_PATHS = new Set(["/", "/index.html"]);
 
 const DEFAULTS = {
@@ -192,7 +192,7 @@ function renderLandingPage(url, env) {
  * query URLs would spend container time on results nobody reads.
  */
 function robotsTxt() {
-  const body = ["User-agent: *", "Allow: /$", "Disallow: /sparql", "Disallow: /query", ""].join("\n");
+  const body = ["User-agent: *", "Allow: /$", "Disallow: /sparql", ""].join("\n");
   return new Response(body, {
     headers: {
       "content-type": "text/plain; charset=utf-8",

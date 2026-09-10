@@ -3,15 +3,15 @@ import { test } from "node:test";
 
 import { rawPathOf } from "../src/http.js";
 
-const QUERY_PATHS = new Set(["/sparql", "/query"]);
+const QUERY_PATHS = new Set(["/sparql"]);
 const served = (u) => QUERY_PATHS.has(rawPathOf(u));
 const host = "https://ja-dbpedia.egpl.dev";
 
-test("the canonical spellings are served", () => {
+test("the canonical spelling is served", () => {
   assert.equal(served(`${host}/sparql`), true);
-  assert.equal(served(`${host}/query`), true);
   assert.equal(served(`${host}/sparql?query=SELECT%20*%20WHERE%7B%3Fs%20%3Fp%20%3Fo%7D`), true);
   assert.equal(served(`${host}/sparql#frag`), true);
+  assert.equal(served(`${host}/query`), false);
 });
 
 test("dot-segment spellings do not reach the endpoint", () => {
