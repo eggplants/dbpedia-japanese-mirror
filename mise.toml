@@ -1,0 +1,57 @@
+[tools]
+"aqua:azu/dockerfile-pin" = "latest"
+claude = "latest"
+"github:k1LoW/mo" = "latest"
+markdownlint-cli2 = "latest"
+pipx = "latest"
+"pipx:rqw" = "latest"
+
+[settings]
+minimum_release_age = "7d"
+
+[tasks."fmt:mise"]
+run = "mise fmt"
+
+[tasks."lint:mise"]
+run = "mise fmt -c"
+
+[tasks."fmt:markdown"]
+run = 'markdownlint-cli2 --fix "*.md"'
+
+[tasks."lint:markdown"]
+run = 'markdownlint-cli2 "*.md"'
+
+[tasks."fmt:subprojects"]
+run = """
+#!/usr/bin/env bash
+set -uo pipefail
+status=0
+while IFS= read -r -d "" config; do
+  project="$(dirname "${config}")"
+  echo "[INFO] mise --cd ${project} run fmt"
+  mise --cd "${project}" run fmt || status=1
+done < <(find . -mindepth 2 -maxdepth 2 -name mise.toml -not -path "*/node_modules/*" -print0)
+exit "${status}"
+"""
+
+[tasks."lint:subprojects"]
+run = """
+#!/usr/bin/env bash
+set -uo pipefail
+status=0
+while IFS= read -r -d "" config; do
+  project="$(dirname "${config}")"
+  echo "[INFO] mise --cd ${project} run lint"
+  mise --cd "${project}" run lint || status=1
+done < <(find . -mindepth 2 -maxdepth 2 -name mise.toml -not -path "*/node_modules/*" -print0)
+exit "${status}"
+"""
+
+[tasks.fmt]
+depends = ["fmt:mise", "fmt:markdown", "fmt:subprojects"]
+
+[tasks.lint]
+depends = ["lint:mise", "lint:markdown", "lint:subprojects"]
+
+[tasks.pre-commit]
+depends = ["lint"]

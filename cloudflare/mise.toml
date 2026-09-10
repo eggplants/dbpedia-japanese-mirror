@@ -1,0 +1,166 @@
+[tools]
+markdownlint-cli2 = "latest"
+node = "latest"
+shellcheck = "latest"
+terraform = "latest"
+tflint = "latest"
+
+[settings]
+minimum_release_age = "7d"
+
+[env]
+DUMP_VERSION = "{{ exec(command='echo ${DUMP_VERSION:-$(sed -n s/^DUMP_VERSION=//p ../docker-compose/.env 2>/dev/null | tail -n1)}') }}"
+STORE_DIR = "{{ get_env(name='STORE_DIR', default='../docker-compose/store') }}"
+IMAGE_NAME = "{{ get_env(name='IMAGE_NAME', default='dbpedia-ja-oxigraph') }}"
+IMAGE_TAG = "{{ get_env(name='IMAGE_TAG', default=env.DUMP_VERSION) }}"
+IMAGE = "{{ env.IMAGE_NAME }}:{{ env.IMAGE_TAG }}"
+
+[tasks._check-env]
+hide = true
+dir = "{{config_root}}"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ -z "${DUMP_VERSION}" ]]; then
+  echo "[ERROR] DUMP_VERSION is empty." >&2
+  echo "        Set it in ../docker-compose/.env, or run with DUMP_VERSION=... mise run <task>" >&2
+  exit 1
+fi
+'''
+
+[tasks._check-store]
+hide = true
+depends = ["_check-env"]
+dir = "{{config_root}}"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ ! -d "${STORE_DIR}/db" ]]; then
+  echo "[ERROR] No store at ${STORE_DIR}/db." >&2
+  echo "        Build it first: cd ../docker-compose && docker compose up load" >&2
+  exit 1
+fi
+echo "[INFO] Store: ${STORE_DIR}/db ($(du -sh "${STORE_DIR}/db" | cut -f1))"
+'''
+
+[tasks.test]
+description = "Run the gateway unit tests"
+dir = "{{config_root}}/worker"
+run = ["npm install --no-audit --no-fund", "npm test"]
+
+[tasks.bundle]
+description = "Build the Worker bundle Terraform uploads"
+dir = "{{config_root}}/worker"
+sources = ["src/*.js", "package.json"]
+outputs = ["dist/index.mjs"]
+run = ["npm install --no-audit --no-fund", "npm run build"]
+
+[tasks.image]
+description = "Bake the Oxigraph store into a container image"
+depends = ["_check-store"]
+dir = "{{config_root}}"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+docker build -f container/Dockerfile -t "${IMAGE}" "${STORE_DIR}"
+size="$(docker image inspect "${IMAGE}" | jq -r '.[0].Size' | numfmt --to=iec)"
+echo "[INFO] Image ${IMAGE} is ${size}. Keep this under container_disk_mb in terraform.tfvars."
+'''
+
+[tasks.push]
+description = "Push the image to the Cloudflare managed registry"
+depends = ["image"]
+dir = "{{config_root}}"
+run = "npx --yes wrangler@4 containers push \"${IMAGE}\""
+
+[tasks.init]
+description = "terraform init"
+dir = "{{config_root}}/terraform"
+run = "terraform init"
+
+[tasks.plan]
+description = "terraform plan"
+depends = ["bundle", "_check-env"]
+dir = "{{config_root}}/terraform"
+run = "terraform plan -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\""
+
+[tasks.apply]
+description = "terraform apply"
+depends = ["bundle", "_check-env"]
+dir = "{{config_root}}/terraform"
+run = "terraform apply -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\""
+
+[tasks.destroy]
+description = "terraform destroy"
+depends = ["_check-env"]
+dir = "{{config_root}}/terraform"
+run = "terraform destroy -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\""
+
+[tasks.deploy]
+description = "Build and push the image, then apply"
+dir = "{{config_root}}"
+run = ["mise run push", "mise run apply"]
+
+[tasks.clean]
+description = "Remove the Worker build output"
+dir = "{{config_root}}"
+run = "rm -rf worker/dist worker/node_modules"
+
+[tasks."fmt:mise"]
+run = "mise fmt"
+
+[tasks."lint:mise"]
+run = "mise fmt -c"
+
+[tasks."fmt:markdown"]
+run = 'markdownlint-cli2 --config ../.markdownlint.yaml --fix "**/*.md" "!**/node_modules/**" "!**/dist/**"'
+
+[tasks."lint:markdown"]
+run = 'markdownlint-cli2 --config ../.markdownlint.yaml "**/*.md" "!**/node_modules/**" "!**/dist/**"'
+
+[tasks."fmt:terraform"]
+dir = "{{config_root}}"
+run = "terraform fmt -recursive ."
+
+[tasks."lint:terraform"]
+dir = "{{config_root}}"
+run = "terraform fmt -recursive -check -diff ."
+
+[tasks."fmt:tflint"]
+dir = "{{config_root}}"
+wait_for = ["fmt:terraform"]
+run = [
+  "tflint --init",
+  "tflint --recursive --minimum-failure-severity=error --fix",
+]
+
+[tasks."lint:tflint"]
+dir = "{{config_root}}"
+run = ["tflint --init", "tflint --recursive --minimum-failure-severity=error"]
+
+[tasks."lint:shell"]
+dir = "{{config_root}}"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+while IFS= read -r -d "" script; do
+  echo "[INFO] shellcheck: ${script}"
+  shellcheck "${script}"
+done < <(find . -type f -name "*.sh" -not -path "*/node_modules/*" -not -path "*/.terraform/*" -print0)
+'''
+
+[tasks.fmt]
+depends = ["fmt:mise", "fmt:markdown", "fmt:terraform", "fmt:tflint"]
+
+[tasks.lint]
+depends = [
+  "lint:mise",
+  "lint:markdown",
+  "lint:terraform",
+  "lint:tflint",
+  "lint:shell",
+  "test",
+]
+
+[tasks.pre-commit]
+depends = ["lint"]

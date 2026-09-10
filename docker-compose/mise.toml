@@ -1,0 +1,26 @@
+[tools]
+markdownlint-cli2 = "latest"
+
+[settings]
+minimum_release_age = "7d"
+
+[tasks."fmt:mise"]
+run = "mise fmt"
+
+[tasks."lint:mise"]
+run = "mise fmt -c"
+
+[tasks."fmt:markdown"]
+run = 'markdownlint-cli2 --config ../.markdownlint.yaml --fix "**/*.md"'
+
+[tasks."lint:markdown"]
+run = 'markdownlint-cli2 --config ../.markdownlint.yaml "**/*.md"'
+
+[tasks.fmt]
+depends = ["fmt:mise", "fmt:markdown"]
+
+[tasks.lint]
+depends = ["lint:mise", "lint:markdown"]
+
+[tasks.pre-commit]
+depends = ["lint"]

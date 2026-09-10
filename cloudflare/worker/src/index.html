@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DBpedia Japanese SPARQL mirror</title>
+    <meta
+      name="description"
+      content="An unofficial, read-only SPARQL mirror of DBpedia Japanese (__DATASET_VERSION__)."
+    />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🗾</text></svg>" />
+    <script type="module" src="https://esm.sh/@sib-swiss/sparql-editor@0.2.15"></script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --fg: #16181d;
+        --muted: #5b6270;
+        --bg: #ffffff;
+        --panel: #f5f6f8;
+        --border: #d8dce3;
+        --accent: #0b6ea8;
+        --warn-bg: #fff6e0;
+        --warn-border: #e0b44a;
+        --warn-fg: #6b4c05;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #e6e8ec;
+          --muted: #98a0ae;
+          --bg: #14161a;
+          --panel: #1c1f25;
+          --border: #2e333c;
+          --accent: #58b6e8;
+          --warn-bg: #2b2312;
+          --warn-border: #7a6224;
+          --warn-fg: #e8cf90;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+        line-height: 1.7;
+      }
+      .wrap {
+        max-width: 72rem;
+        margin: 0 auto;
+        padding: 1.5rem 1.25rem 3rem;
+      }
+      header h1 {
+        font-size: 1.35rem;
+        margin: 0 0 0.2rem;
+      }
+      header p.sub {
+        margin: 0 0 1.25rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      a {
+        color: var(--accent);
+      }
+      .notice {
+        background: var(--warn-bg);
+        border: 1px solid var(--warn-border);
+        color: var(--warn-fg);
+        border-radius: 0.5rem;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.25rem;
+        font-size: 0.92rem;
+      }
+      .notice strong {
+        display: block;
+        margin-bottom: 0.3rem;
+      }
+      .notice p {
+        margin: 0.4rem 0 0;
+      }
+      .notice .en {
+        opacity: 0.85;
+      }
+      dl.facts {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 0.35rem 1.25rem;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        padding: 1rem 1.15rem;
+        margin: 0 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      dl.facts dt {
+        color: var(--muted);
+      }
+      dl.facts dd {
+        margin: 0;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.9em;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 0.25rem;
+        padding: 0.05rem 0.35rem;
+      }
+      pre {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        padding: 0.85rem 1rem;
+        overflow-x: auto;
+        font-size: 0.85rem;
+      }
+      sparql-editor {
+        display: block;
+        margin-bottom: 2rem;
+      }
+      footer {
+        border-top: 1px solid var(--border);
+        margin-top: 2rem;
+        padding-top: 1rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      h2 {
+        font-size: 1.05rem;
+        margin: 2rem 0 0.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>DBpedia Japanese SPARQL mirror</h1>
+        <p class="sub">dataset <code>__DATASET_VERSION__</code></p>
+      </header>
+
+      <div class="notice">
+        <strong>⚠️ これは非公式ミラーです</strong>
+        <p>
+          DBpedia Japanese プロジェクトが運営するものではなく、
+          <a href="https://ja.dbpedia.org/dumps/">公開ダンプ</a>
+          を個人が読み込んで公開している読み取り専用のコピーです。データの内容・更新時期について
+          DBpedia Japanese 側に問い合わせないでください。可用性の保証はなく、予告なく停止することがあります。
+          公式のエンドポイントは <a href="https://ja.dbpedia.org/">ja.dbpedia.org</a> にあります。
+        </p>
+        <p class="en">
+          <strong style="display: inline">Unofficial mirror.</strong>
+          This is a personally operated, read-only copy built from the published
+          <a href="https://ja.dbpedia.org/dumps/">DBpedia Japanese dumps</a>. It is not run by the DBpedia
+          Japanese project, carries no availability guarantee, and may be taken down without notice.
+        </p>
+      </div>
+
+      <dl class="facts">
+        <dt>Endpoint</dt>
+        <dd><code>__ENDPOINT__</code></dd>
+        <dt>Dataset</dt>
+        <dd>DBpedia Japanese <code>__DATASET_VERSION__</code></dd>
+        <dt>Store</dt>
+        <dd><a href="https://github.com/oxigraph/oxigraph">Oxigraph</a>, read-only</dd>
+        <dt>Supported</dt>
+        <dd>SPARQL 1.1 Query over GET / POST. Update, federation (<code>SERVICE</code>) and Graph Store are not served</dd>
+        <dt>Licence</dt>
+        <dd>
+          <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> and
+          <a href="https://www.gnu.org/licenses/fdl-1.3.html">GNU FDL</a>, as published by DBpedia
+        </dd>
+      </dl>
+
+      <sparql-editor endpoint="__ENDPOINT__" default-method="GET" add-limit="10000"></sparql-editor>
+
+      <h2>コマンドラインから / From the command line</h2>
+      <pre>curl -sG __ENDPOINT__ \
+  -H 'Accept: application/sparql-results+json' \
+  --data-urlencode 'query=SELECT ?o WHERE {
+      &lt;http://ja.dbpedia.org/resource/日本&gt; &lt;http://www.w3.org/2000/01/rdf-schema#label&gt; ?o
+  } LIMIT 10'</pre>
+
+      <h2>制限 / Limits</h2>
+      <p style="font-size: 0.92rem">
+        1 クエリあたりの実行時間には上限があり、IP 単位のレート制限がかかります。
+        <code>LIMIT</code> の無いクエリや集約・正規表現を含むクエリは、より厳しい枠から消費されます。
+        同じクエリの結果はエッジでキャッシュされるため、繰り返しの取得は制限に数えられません。
+        まとまった量のデータが必要なときは、エンドポイントを叩くのではなく
+        <a href="https://ja.dbpedia.org/dumps/">ダンプ</a> を直接ダウンロードしてください。
+      </p>
+      <p class="en" style="font-size: 0.92rem">
+        Queries are time-bounded and rate limited per IP; queries without a <code>LIMIT</code>, or with an
+        aggregate or a regex, are charged against a stricter bucket. Identical queries are served from the
+        edge cache and do not count against the limit. For bulk access, take the dumps rather than the
+        endpoint.
+      </p>
+
+      <footer>
+        Editor:
+        <a href="https://github.com/sib-swiss/sparql-editor">@sib-swiss/sparql-editor</a> ·
+        Deployment: <a href="__SOURCE_REPOSITORY__">__SOURCE_REPOSITORY__</a>
+      </footer>
+    </div>
+  </body>
+</html>

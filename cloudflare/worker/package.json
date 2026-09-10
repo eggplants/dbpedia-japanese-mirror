@@ -1,0 +1,17 @@
+{
+  "name": "dbpedia-japanese-sparql-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Worker that fronts the Oxigraph container for the DBpedia Japanese mirror",
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --format=esm --platform=neutral --target=es2022 --main-fields=module,main --conditions=workerd,worker,browser --loader:.html=text --external:cloudflare:* --external:node:* --outfile=dist/index.mjs",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

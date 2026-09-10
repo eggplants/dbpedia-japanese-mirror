@@ -1,0 +1,43 @@
+name: dbpedia-japanese-mirror
+
+services:
+  download:
+    build: ./downloader
+    image: dbpedia-japanese-mirror/downloader
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - ${DATA_DIR:-./data}:/data
+    restart: "no"
+
+  load:
+    build:
+      context: ./loader
+      args:
+        OXIGRAPH_VERSION: ${OXIGRAPH_VERSION:-0.5.11}
+    image: dbpedia-japanese-mirror/loader
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      STORE_LOCATION: /store/db
+      MARKER_DIR: /store/.loaded
+    volumes:
+      - ${DATA_DIR:-./data}:/data:ro
+      - ${STORE_DIR:-./store}:/store
+    depends_on:
+      download:
+        condition: service_completed_successfully
+    restart: "no"
+
+  serve:
+    image: ghcr.io/oxigraph/oxigraph:${OXIGRAPH_VERSION:-0.5.11}
+    command: ${OXIGRAPH_SERVE_CMD:-serve-read-only} --location /store/db --bind 0.0.0.0:7878 ${OXIGRAPH_SERVE_OPTS:-}
+    ports:
+      - "${OXIGRAPH_HTTP_PORT:-7878}:7878"
+    volumes:
+      - ${STORE_DIR:-./store}:/store
+    depends_on:
+      load:
+        condition: service_completed_successfully
+    restart: unless-stopped

@@ -1,0 +1,46 @@
+# cp terraform.tfvars.example terraform.tfvars and fill these in.
+# The API token goes in the environment, not here:
+#   export CLOUDFLARE_API_TOKEN=...
+
+account_id = "0123456789abcdef0123456789abcdef"
+zone_name  = "egpl.dev"
+hostname   = "ja-dbpedia.egpl.dev"
+
+# egpl.dev はすでに Cloudflare のゾーンなので、名前で引くだけでよい。
+# 新しくドメインを追加するときだけ true にする（apply 後に name_servers 出力を
+# レジストラ側へ設定する）。
+manage_zone = false
+# 名前で引かず ID で固定したいときだけ:
+# zone_id = "fedcba9876543210fedcba9876543210"
+
+source_repository = "https://github.com/eggplants/dbpedia-japanese-mirror"
+
+# *.workers.dev でも配信する。ゾーンのルールが一切効かない入口が増えるので、
+# ネームサーバ切り替え前の動作確認用に限ること。
+enable_workers_dev = false
+
+# Must match DUMP_VERSION in docker-compose/.env
+dataset_version = "20221201"
+
+# Pushed by `make push`; the tag is DUMP_VERSION by default
+container_image = "dbpedia-ja-oxigraph:20221201"
+
+# Sizing. Measured at 114 bytes/triple in the default graph and roughly twice
+# that in a named graph; the core profile is around 54M triples. Serving needs
+# very little memory (64 MB RSS on a 34M-triple store), so memory here is really
+# page cache for the store.
+container_vcpu          = 1
+container_memory_mib    = 2048
+container_disk_mb       = 16000
+container_max_instances = 3
+container_sleep_after   = "20m"
+container_pool_size     = 1
+
+# Rate limits (per IP, per Cloudflare location)
+rate_limit_burst     = 30
+rate_limit_sustained = 120
+rate_limit_heavy     = 10
+
+# Zone-level ceiling. On the Free plan mitigation_timeout has to be 10.
+zone_rate_limit_requests           = 300
+zone_rate_limit_mitigation_timeout = 60
