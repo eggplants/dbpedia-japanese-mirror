@@ -1,6 +1,8 @@
 [tools]
 markdownlint-cli2 = "latest"
 node = "latest"
+"npm:cf" = "latest"
+"npm:wrangler" = "latest"
 shellcheck = "latest"
 terraform = "latest"
 tflint = "latest"
@@ -14,6 +16,7 @@ STORE_DIR = "{{ get_env(name='STORE_DIR', default='../docker-compose/store') }}"
 IMAGE_NAME = "{{ get_env(name='IMAGE_NAME', default='dbpedia-ja-oxigraph') }}"
 IMAGE_TAG = "{{ get_env(name='IMAGE_TAG', default=env.DUMP_VERSION) }}"
 IMAGE = "{{ env.IMAGE_NAME }}:{{ env.IMAGE_TAG }}"
+CLOUDFLARE_API_TOKEN = "{{ exec(command='jq -r .oauth_token ~/.config/cloudflare/config/default.json') }}"
 
 [tasks._check-env]
 hide = true
@@ -71,7 +74,7 @@ echo "[INFO] Image ${IMAGE} is ${size}. Keep this under container_disk_mb in ter
 description = "Push the image to the Cloudflare managed registry"
 depends = ["image"]
 dir = "{{config_root}}"
-run = "npx --yes wrangler@4 containers push \"${IMAGE}\""
+run = "wrangler containers push \"${IMAGE}\""
 
 [tasks.init]
 description = "terraform init"
