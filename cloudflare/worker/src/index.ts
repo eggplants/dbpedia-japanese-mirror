@@ -30,6 +30,7 @@ export interface Env {
   RL_SUSTAINED?: RateLimit;
   RL_HEAVY?: RateLimit;
   DATASET_VERSION?: string;
+  DATASET_PROFILE?: string;
   SOURCE_REPOSITORY?: string;
   CONTAINER_SLEEP_AFTER?: string;
   MAX_QUERY_BYTES?: string;
@@ -205,6 +206,7 @@ function renderLandingPage(url: URL, env: Env): Response {
   const html = landingPage
     .replaceAll("__ENDPOINT__", `${url.origin}/sparql`)
     .replaceAll("__DATASET_VERSION__", env.DATASET_VERSION ?? "unknown")
+    .replaceAll("__DATASET_PROFILE__", env.DATASET_PROFILE ?? "unknown")
     .replaceAll("__SOURCE_REPOSITORY__", env.SOURCE_REPOSITORY ?? "");
 
   return new Response(html, {

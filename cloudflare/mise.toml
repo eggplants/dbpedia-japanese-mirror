@@ -20,6 +20,7 @@ minimum_release_age = "7d"
 
 [env]
 DUMP_VERSION = "{{ exec(command='echo ${DUMP_VERSION:-$(sed -n s/^DUMP_VERSION=//p ../docker-compose/.env 2>/dev/null | tail -n1)}') }}"
+DUMP_PROFILE = "{{ exec(command='echo ${DUMP_PROFILE:-$(sed -n s/^DUMP_PROFILE=//p ../docker-compose/.env 2>/dev/null | tail -n1)}') }}"
 STORE_DIR = "{{ get_env(name='STORE_DIR', default='../docker-compose/store') }}"
 IMAGE_NAME = "{{ get_env(name='IMAGE_NAME', default='dbpedia-ja-oxigraph') }}"
 IMAGE_TAG = "{{ get_env(name='IMAGE_TAG', default=env.DUMP_VERSION) }}"
@@ -93,19 +94,19 @@ run = "terraform init"
 description = "terraform plan"
 depends = ["bundle", "_check-env"]
 dir = "{{config_root}}/terraform"
-run = "terraform plan -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\""
+run = "terraform plan -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\" -var \"dataset_profile=${DUMP_PROFILE:-core}\""
 
 [tasks.apply]
 description = "terraform apply"
 depends = ["bundle", "_check-env"]
 dir = "{{config_root}}/terraform"
-run = "terraform apply -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\""
+run = "terraform apply -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\" -var \"dataset_profile=${DUMP_PROFILE:-core}\""
 
 [tasks.destroy]
 description = "terraform destroy"
 depends = ["_check-env"]
 dir = "{{config_root}}/terraform"
-run = "terraform destroy -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\""
+run = "terraform destroy -var \"container_image=${IMAGE}\" -var \"dataset_version=${DUMP_VERSION}\" -var \"dataset_profile=${DUMP_PROFILE:-core}\""
 
 [tasks.deploy]
 description = "Build and push the image, then apply"

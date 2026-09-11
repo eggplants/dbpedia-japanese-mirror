@@ -60,6 +60,11 @@ resource "cloudflare_worker_version" "sparql" {
       },
       {
         type = "plain_text"
+        name = "DATASET_PROFILE"
+        text = var.dataset_profile
+      },
+      {
+        type = "plain_text"
         name = "SOURCE_REPOSITORY"
         text = var.source_repository
       },

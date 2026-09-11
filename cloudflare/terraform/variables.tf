@@ -145,6 +145,17 @@ variable "dataset_version" {
   description = "DUMP_VERSION of the loaded dataset, e.g. 20221201. Part of the cache key: bumping it invalidates every cached answer."
 }
 
+variable "dataset_profile" {
+  type        = string
+  default     = "core"
+  description = "DUMP_PROFILE the store was built with (core / ja / full). Shown on the landing page."
+
+  validation {
+    condition     = contains(["core", "ja", "full"], var.dataset_profile)
+    error_message = "dataset_profile must be one of core, ja, full."
+  }
+}
+
 variable "compatibility_date" {
   type        = string
   default     = "2026-09-01"

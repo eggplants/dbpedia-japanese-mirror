@@ -15,6 +15,9 @@ enable_workers_dev = false
 # Must match DUMP_VERSION in docker-compose/.env
 dataset_version = "20221201"
 
+# Must match DUMP_PROFILE in docker-compose/.env
+dataset_profile = "core"
+
 # Pushed by `make push`; the tag is DUMP_VERSION by default
 container_image = "dbpedia-ja-oxigraph:20221201"
 
