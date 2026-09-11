@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://www.schemastore.org/dependabot-2.0.json
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /cloudflare/worker
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      npm:
+        patterns: ["*"]
+
+  - package-ecosystem: terraform
+    directory: /cloudflare/terraform
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      terraform:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories:
+      - /cloudflare/container
+      - /docker-compose/downloader
+      - /docker-compose/loader
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      docker:
+        patterns: ["*"]
+
+  - package-ecosystem: docker-compose
+    directory: /docker-compose
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      docker-compose:
+        patterns: ["*"]

@@ -14,8 +14,6 @@ services:
   load:
     build:
       context: ./loader
-      args:
-        OXIGRAPH_VERSION: ${OXIGRAPH_VERSION:-0.5.11}
     image: dbpedia-japanese-mirror/loader
     env_file: .env
     environment:
@@ -31,7 +29,7 @@ services:
     restart: "no"
 
   serve:
-    image: ghcr.io/oxigraph/oxigraph:${OXIGRAPH_VERSION:-0.5.11}
+    image: ghcr.io/oxigraph/oxigraph:0.5.11@sha256:7532c1f9aa5f28c0dc6a4243198f7f6144017fab7429bf6c164a89fec9411767
     command: ${OXIGRAPH_SERVE_CMD:-serve-read-only} --location /store/db --bind 0.0.0.0:7878 ${OXIGRAPH_SERVE_OPTS:-}
     ports:
       - "${OXIGRAPH_HTTP_PORT:-7878}:7878"

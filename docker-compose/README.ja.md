@@ -107,7 +107,6 @@ DUMP_EXCLUDE_REGEX=^$
 
 | 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `OXIGRAPH_VERSION` | `0.5.11` | イメージのタグ。サーバと loader のビルド双方で使う |
 | `OXIGRAPH_HTTP_PORT` | `7878` | エンドポイントと Web UI の公開ポート |
 | `STORE_DIR` | `./store` | `db/`（RocksDB のストア）と `.loaded/`（マーカ）を置く |
 | `OXIGRAPH_SERVE_CMD` | `serve-read-only` | `serve-read-only`、または読み書き可能な `serve` |
