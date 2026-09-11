@@ -58,18 +58,17 @@ API トークンに必要な権限:
 
 ```bash
 cd cloudflare
-mise trust                                  # タスクは cloudflare/mise.toml にある
+mise trust
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
-$EDITOR terraform/terraform.tfvars          # account_id, zone_id, hostname など
+$EDITOR terraform/terraform.tfvars
 
-export CLOUDFLARE_API_TOKEN=...
-
-mise run lint:worker                        # vp check（フォーマット・lint・型チェック）
-mise run test                               # ゲートウェイの単体テスト
+mise run lint
+mise run test
 mise run init
-mise run deploy                             # bundle・image・push・apply
+mise run plan
 
-# 確認
+mise run deploy
+
 time rqw -e https://ja-dbpedia.egpl.dev/sparql -Q 'SELECT ?o WHERE {
   <http://ja.dbpedia.org/resource/日本> <http://www.w3.org/2000/01/rdf-schema#label> ?o
 } LIMIT 10'

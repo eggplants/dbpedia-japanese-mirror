@@ -58,18 +58,18 @@ Permissions the API token needs:
 
 ```bash
 cd cloudflare
-mise trust                                  # the tasks live in cloudflare/mise.toml
+mise trust
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
-$EDITOR terraform/terraform.tfvars          # account_id, zone_id, hostname, ...
+$EDITOR terraform/terraform.tfvars
 
-export CLOUDFLARE_API_TOKEN=...
-
-mise run lint:worker                        # vp check: format, lint, type check
-mise run test                               # gateway unit tests
+mise run lint
+mise run test
 mise run init
-mise run deploy                             # bundle, image, push, apply
+mise run plan
 
-# check it
+mise run deploy
+
+# check
 time rqw -e https://ja-dbpedia.egpl.dev/sparql -Q 'SELECT ?o WHERE {
   <http://ja.dbpedia.org/resource/日本> <http://www.w3.org/2000/01/rdf-schema#label> ?o
 } LIMIT 10'
