@@ -18,10 +18,10 @@
  * The path as written in the request line, with no normalization applied.
  * Returns "/" when the URL carries no path at all.
  */
-export function rawPathOf(requestUrl) {
+export function rawPathOf(requestUrl: string): string {
   // Strip scheme and authority, then anything from the first ? or #.
   const afterAuthority = requestUrl.replace(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^/?#]*/, "");
-  const path = afterAuthority.split(/[?#]/, 1)[0];
+  const path = afterAuthority.split(/[?#]/, 1)[0] ?? "";
   return path === "" ? "/" : path;
 }
 
@@ -30,6 +30,6 @@ export function rawPathOf(requestUrl) {
  * segment, a percent-encoded dot, a doubled slash, a trailing slash, a different
  * case — is not this route.
  */
-export function isCanonicalPath(rawPath, allowed) {
+export function isCanonicalPath(rawPath: string, allowed: ReadonlySet<string>): boolean {
   return allowed.has(rawPath);
 }

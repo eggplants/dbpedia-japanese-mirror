@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { test } from "vite-plus/test";
 
 import {
   isFederated,
@@ -7,9 +7,9 @@ import {
   looksExpensive,
   normalizeAccept,
   stripLiteralsAndComments,
-} from "../src/sparql.js";
+} from "../src/sparql.ts";
 
-const bare = (q) => stripLiteralsAndComments(q);
+const bare = (q: string): string => stripLiteralsAndComments(q);
 
 test("rejects the SPARQL Update forms", () => {
   for (const q of [
@@ -40,15 +40,24 @@ test("does not trip on keywords inside literals, IRIs or comments", () => {
 });
 
 test("blocks federation", () => {
-  assert.equal(isFederated(bare("SELECT * WHERE { SERVICE <http://x/> { ?s ?p ?o } } LIMIT 1")), true);
+  assert.equal(
+    isFederated(bare("SELECT * WHERE { SERVICE <http://x/> { ?s ?p ?o } } LIMIT 1")),
+    true,
+  );
   assert.equal(isFederated(bare('SELECT * WHERE { ?s rdfs:label "SERVICE" } LIMIT 1')), false);
 });
 
 test("classifies expensive queries", () => {
   assert.equal(looksExpensive(bare("SELECT * WHERE { ?s ?p ?o }")), true, "no LIMIT");
-  assert.equal(looksExpensive(bare("SELECT (COUNT(*) AS ?c) WHERE { ?s ?p ?o } LIMIT 1")), true, "aggregate");
   assert.equal(
-    looksExpensive(bare('SELECT ?s WHERE { ?s rdfs:label ?l FILTER(REGEX(?l, "^東京")) } LIMIT 10')),
+    looksExpensive(bare("SELECT (COUNT(*) AS ?c) WHERE { ?s ?p ?o } LIMIT 1")),
+    true,
+    "aggregate",
+  );
+  assert.equal(
+    looksExpensive(
+      bare('SELECT ?s WHERE { ?s rdfs:label ?l FILTER(REGEX(?l, "^東京")) } LIMIT 10'),
+    ),
     true,
     "regex",
   );

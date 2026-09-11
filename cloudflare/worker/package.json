@@ -2,16 +2,33 @@
   "name": "dbpedia-japanese-sparql-gateway",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "description": "Worker that fronts the Oxigraph container for the DBpedia Japanese mirror",
+  "type": "module",
   "scripts": {
-    "build": "esbuild src/index.js --bundle --format=esm --platform=neutral --target=es2022 --main-fields=module,main --conditions=workerd,worker,browser --loader:.html=text --external:cloudflare:* --external:node:* --outfile=dist/index.mjs",
-    "test": "node --test test/"
+    "build": "esbuild src/index.ts --bundle --format=esm --platform=neutral --target=es2022 --main-fields=module,main --conditions=workerd,worker,browser --loader:.html=text --external:cloudflare:* --external:node:* --outfile=dist/index.mjs"
   },
   "dependencies": {
     "@cloudflare/containers": "^0.3.7"
   },
   "devDependencies": {
-    "esbuild": "^0.28.2"
+    "@cloudflare/workers-types": "^5.20260901.0",
+    "@types/node": "^26.4.1",
+    "esbuild": "^0.28.2",
+    "vite-plus": "0.3.1"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^12.0.0",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1"
+    }
   }
 }

@@ -1,18 +1,22 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { test } from "node:test";
+import path from "node:path";
+import { test } from "vite-plus/test";
 
-const html = readFileSync(new URL("../src/index.html", import.meta.url), "utf8");
-const worker = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+const html = readFileSync(path.join(import.meta.dirname, "../src/index.html"), "utf8");
+const worker = readFileSync(path.join(import.meta.dirname, "../src/index.ts"), "utf8");
 
 /** Placeholders the Worker knows how to fill in. */
-const substituted = [...worker.matchAll(/replaceAll\("(__[A-Z_]+__)"/g)].map((m) => m[1]);
+const substituted = [...worker.matchAll(/replaceAll\("(__[A-Z_]+__)"/g)].map((m) => m[1] ?? "");
 
 test("the page and the Worker agree on the placeholder names", () => {
   const inPage = new Set(html.match(/__[A-Z_]+__/g) ?? []);
   assert.ok(inPage.size > 0, "the page should have placeholders");
   for (const name of inPage) {
-    assert.ok(substituted.includes(name), `${name} appears in the page but the Worker never fills it in`);
+    assert.ok(
+      substituted.includes(name),
+      `${name} appears in the page but the Worker never fills it in`,
+    );
   }
   for (const name of substituted) {
     assert.ok(inPage.has(name), `the Worker fills in ${name} but the page never uses it`);

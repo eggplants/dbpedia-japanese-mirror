@@ -64,6 +64,7 @@ $EDITOR terraform/terraform.tfvars          # account_id, zone_id, hostname な�
 
 export CLOUDFLARE_API_TOKEN=...
 
+mise run lint:worker                        # vp check（フォーマット・lint・型チェック）
 mise run test                               # ゲートウェイの単体テスト
 mise run init
 mise run deploy                             # bundle・image・push・apply
@@ -82,10 +83,11 @@ cloudflare/
 ├── container/
 │   └── Dockerfile                 # oxigraph + ストア。ビルドコンテキストは ../docker-compose/store
 ├── worker/
-│   ├── src/index.js               # ゲートウェイとコンテナが紐づく Durable Object
-│   ├── src/sparql.js              # クエリ検査（読み取り専用の担保・コスト推定）
+│   ├── src/index.ts               # ゲートウェイとコンテナが紐づく Durable Object
+│   ├── src/sparql.ts              # クエリ検査（読み取り専用の担保・コスト推定）
 │   ├── src/index.html             # 告知ページ。ビルド時にバンドルへ埋め込まれる
-│   └── test/                      # node --test
+│   ├── test/                      # vp test (Vitest)
+│   └── vite.config.ts             # Vite+ の fmt / lint / 型チェック設定
 └── terraform/
     ├── .tflint.hcl                # terraform ruleset を all プリセットで
     ├── main.tf                    # worker・version・deployment・カスタムドメイン

@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { test } from "vite-plus/test";
 
-import { rawPathOf } from "../src/http.js";
+import { rawPathOf } from "../src/http.ts";
 
 const QUERY_PATHS = new Set(["/sparql"]);
-const served = (u) => QUERY_PATHS.has(rawPathOf(u));
+const served = (u: string): boolean => QUERY_PATHS.has(rawPathOf(u));
 const host = "https://ja-dbpedia.egpl.dev";
 
 test("the canonical spelling is served", () => {

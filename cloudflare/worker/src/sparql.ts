@@ -5,7 +5,7 @@
  * `serve-read-only`, so the checks here exist to reject a request before it
  * costs container time, not to be the only thing standing between the public
  * and a write. Keeping them in one module makes them testable (see
- * ../test/sparql.test.mjs).
+ * ../test/sparql.test.ts).
  */
 
 /** Whole-token matches, applied only after literals and comments are blanked. */
@@ -17,11 +17,11 @@ const SERVICE_TOKEN = /\bSERVICE\b/i;
  * be fooled by a token that merely appears inside a literal or a URI.
  * `?s rdfs:label "DELETE from the list"` must stay a legal query.
  */
-export function stripLiteralsAndComments(query) {
+export function stripLiteralsAndComments(query: string): string {
   let out = "";
   let i = 0;
   while (i < query.length) {
-    const c = query[i];
+    const c = query[i] ?? "";
 
     if (c === "#") {
       while (i < query.length && query[i] !== "\n") i++;
@@ -32,7 +32,7 @@ export function stripLiteralsAndComments(query) {
     if (c === "<") {
       // An IRIREF cannot contain whitespace or any of <>"{}|^`\
       let j = i + 1;
-      while (j < query.length && !/[\s<>"{}|^`\\]/.test(query[j])) j++;
+      while (j < query.length && !/[\s<>"{}|^`\\]/.test(query[j] ?? "")) j++;
       if (query[j] === ">") {
         out += " ";
         i = j + 1;
@@ -68,11 +68,11 @@ export function stripLiteralsAndComments(query) {
   return out;
 }
 
-export function isUpdate(bare) {
+export function isUpdate(bare: string): boolean {
   return UPDATE_TOKENS.test(bare);
 }
 
-export function isFederated(bare) {
+export function isFederated(bare: string): boolean {
   return SERVICE_TOKEN.test(bare);
 }
 
@@ -80,7 +80,7 @@ export function isFederated(bare) {
  * A cheap stand-in for query planning. Anything that can walk the whole graph
  * gets charged against the stricter rate limit bucket.
  */
-export function looksExpensive(bare) {
+export function looksExpensive(bare: string): boolean {
   const hasLimit = /\bLIMIT\s+\d+/i.test(bare);
   const hasAggregate = /\b(?:COUNT|SUM|AVG|MIN|MAX|GROUP_CONCAT|SAMPLE)\s*\(/i.test(bare);
   const hasTextScan = /\b(?:REGEX|CONTAINS|STRSTARTS|STRENDS)\s*\(/i.test(bare);
@@ -91,7 +91,7 @@ export function looksExpensive(bare) {
  * Collapses the SPARQL protocol's several ways of asking for a result format
  * into the single media type forwarded to Oxigraph and folded into the cache key.
  */
-export function normalizeAccept(accept, format) {
+export function normalizeAccept(accept: string | null, format: string | null): string {
   if (format === "json") return "application/sparql-results+json";
   if (format === "xml") return "application/sparql-results+xml";
   if (format === "csv") return "text/csv";
@@ -99,5 +99,5 @@ export function normalizeAccept(accept, format) {
   if (!accept || accept.trim() === "" || accept.trim() === "*/*") {
     return "application/sparql-results+json";
   }
-  return accept.split(",")[0].trim();
+  return (accept.split(",")[0] ?? "").trim();
 }

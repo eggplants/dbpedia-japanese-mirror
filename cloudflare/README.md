@@ -64,6 +64,7 @@ $EDITOR terraform/terraform.tfvars          # account_id, zone_id, hostname, ...
 
 export CLOUDFLARE_API_TOKEN=...
 
+mise run lint:worker                        # vp check: format, lint, type check
 mise run test                               # gateway unit tests
 mise run init
 mise run deploy                             # bundle, image, push, apply
@@ -82,10 +83,11 @@ cloudflare/
 ├── container/
 │   └── Dockerfile                 # oxigraph + the store; build context is ../docker-compose/store
 ├── worker/
-│   ├── src/index.js               # gateway, plus the Durable Object the container attaches to
-│   ├── src/sparql.js              # query inspection (read-only guarantee, cost heuristics)
+│   ├── src/index.ts               # gateway, plus the Durable Object the container attaches to
+│   ├── src/sparql.ts              # query inspection (read-only guarantee, cost heuristics)
 │   ├── src/index.html             # notice page, inlined into the bundle at build time
-│   └── test/                      # node --test
+│   ├── test/                      # vp test (Vitest)
+│   └── vite.config.ts             # Vite+: fmt / lint / type-check config
 └── terraform/
     ├── .tflint.hcl                # terraform ruleset at the all preset
     ├── main.tf                    # worker, version, deployment, custom domain

@@ -1,3 +1,10 @@
+[plugins]
+# https://github.com/voidzero-dev/vite-plus/issues/943
+vite-plus = "https://github.com/markmals/mise-vite-plus"
+
+[settings.github]
+use_git_credentials = true
+
 [tools]
 markdownlint-cli2 = "latest"
 node = "latest"
@@ -6,6 +13,7 @@ node = "latest"
 shellcheck = "latest"
 terraform = "latest"
 tflint = "latest"
+vite-plus = "latest"
 
 [settings]
 minimum_release_age = "7d"
@@ -49,14 +57,14 @@ echo "[INFO] Store: ${STORE_DIR}/db ($(du -sh "${STORE_DIR}/db" | cut -f1))"
 [tasks.test]
 description = "Run the gateway unit tests"
 dir = "{{config_root}}/worker"
-run = ["npm install --no-audit --no-fund", "npm test"]
+run = ["vp install --frozen-lockfile", "vp test"]
 
 [tasks.bundle]
 description = "Build the Worker bundle Terraform uploads"
 dir = "{{config_root}}/worker"
-sources = ["src/*.js", "package.json"]
+sources = ["src/*", "package.json", "pnpm-lock.yaml"]
 outputs = ["dist/index.mjs"]
-run = ["npm install --no-audit --no-fund", "npm run build"]
+run = ["vp install --frozen-lockfile", "vp run build"]
 
 [tasks.image]
 description = "Bake the Oxigraph store into a container image"
@@ -141,6 +149,16 @@ run = [
 dir = "{{config_root}}"
 run = ["tflint --init", "tflint --recursive --minimum-failure-severity=error"]
 
+[tasks."fmt:worker"]
+description = "Format, lint --fix and type check the Worker"
+dir = "{{config_root}}/worker"
+run = ["vp install --frozen-lockfile", "vp check --fix"]
+
+[tasks."lint:worker"]
+description = "Format check, lint and type check the Worker"
+dir = "{{config_root}}/worker"
+run = ["vp install --frozen-lockfile", "vp check"]
+
 [tasks."lint:shell"]
 dir = "{{config_root}}"
 run = '''
@@ -153,7 +171,13 @@ done < <(find . -type f -name "*.sh" -not -path "*/node_modules/*" -not -path "*
 '''
 
 [tasks.fmt]
-depends = ["fmt:mise", "fmt:markdown", "fmt:terraform", "fmt:tflint"]
+depends = [
+  "fmt:mise",
+  "fmt:markdown",
+  "fmt:terraform",
+  "fmt:tflint",
+  "fmt:worker",
+]
 
 [tasks.lint]
 depends = [
@@ -162,6 +186,7 @@ depends = [
   "lint:terraform",
   "lint:tflint",
   "lint:shell",
+  "lint:worker",
   "test",
 ]
 
