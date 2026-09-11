@@ -204,6 +204,7 @@ export default {
  */
 function renderLandingPage(url: URL, env: Env): Response {
   const html = landingPage
+    .replaceAll("__ORIGIN__", url.origin)
     .replaceAll("__ENDPOINT__", `${url.origin}/sparql`)
     .replaceAll("__DATASET_VERSION__", env.DATASET_VERSION ?? "unknown")
     .replaceAll("__DATASET_PROFILE__", env.DATASET_PROFILE ?? "unknown")
