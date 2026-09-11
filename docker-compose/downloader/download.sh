@@ -20,6 +20,14 @@ urldecode() {
   printf '%b' "${s//%/\\x}"
 }
 
+fix_iri_escapes() {
+  sed -E ':a
+s/^((<[^>]*> ){0,2}<([^>\\]|\\[uU])*)\\[nrt]/\1/
+s/^((<[^>]*> ){0,2}<([^>\\]|\\[uU])*)\\"/\1%22/
+s/^((<[^>]*> ){0,2}<([^>\\]|\\[uU])*)\\\\/\1%5C/
+ta'
+}
+
 if [[ "${1:-}" == "--fetch" ]]; then
   href="$2"; name="$3"; size="$4"
   out="${target_dir}/${name}"
@@ -51,7 +59,7 @@ if [[ "${1:-}" == "--fetch" ]]; then
 
   if [[ "${RECOMPRESS_BZ2_TO_GZ}" == "true" && "${out}" == *.bz2 ]]; then
     echo "[GZIP] ${name} -> $(basename "${gz_out}")"
-    bzcat "${out}" | pigz -c > "${gz_out}.part"
+    bzcat "${out}" | fix_iri_escapes | pigz -c > "${gz_out}.part"
     mv "${gz_out}.part" "${gz_out}"
     chmod 0644 "${gz_out}"
     rm -f "${out}"
