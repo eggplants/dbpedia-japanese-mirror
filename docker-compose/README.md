@@ -60,22 +60,6 @@ rqw -e http://localhost:7878/query -Q 'SELECT ?abstract WHERE {
       <http://ja.dbpedia.org/resource/日本> <http://dbpedia.org/ontology/abstract> ?abstract }'
 ```
 
-## Layout
-
-```text
-docker-compose/
-├── compose.yaml
-├── .env.example            # settings template; cp it to .env
-├── downloader/
-│   ├── Dockerfile
-│   └── download.sh         # fetch the dump index, filter it, download in parallel
-├── loader/
-│   ├── Dockerfile          # the oxigraph binary on a base that has a shell
-│   └── load.sh             # oxigraph load, then optimize
-├── data/                   # downloaded dumps (not tracked by git)
-└── store/                  # the RocksDB store and the load markers (not tracked by git)
-```
-
 ## Choosing a dataset
 
 The available versions are listed at <https://ja.dbpedia.org/dumps/>. Changing `DUMP_VERSION` keeps the dumps under `./data/<version>/` and the markers under `./store/.loaded/<version>/`, separately per version.

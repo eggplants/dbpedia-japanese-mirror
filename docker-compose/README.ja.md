@@ -60,22 +60,6 @@ rqw -e http://localhost:7878/query -Q 'SELECT ?abstract WHERE {
       <http://ja.dbpedia.org/resource/日本> <http://dbpedia.org/ontology/abstract> ?abstract }'
 ```
 
-## ディレクトリ
-
-```text
-docker-compose/
-├── compose.yaml
-├── .env.example            # 設定テンプレート。cp して .env を作る
-├── downloader/
-│   ├── Dockerfile
-│   └── download.sh         # ダンプ一覧の取得・フィルタ・並列ダウンロード
-├── loader/
-│   ├── Dockerfile          # oxigraph バイナリをシェルのあるベースに載せる
-│   └── load.sh             # oxigraph load と optimize
-├── data/                   # ダンプの保存先 (git 管理外)
-└── store/                  # RocksDB のストアとロード済みマーカ (git 管理外)
-```
-
 ## データセットの選択
 
 利用可能なバージョンは <https://ja.dbpedia.org/dumps/> で確認できる。`DUMP_VERSION` を変えるとダンプは `./data/<version>/` に、マーカは `./store/.loaded/<version>/` に分けて保存される。

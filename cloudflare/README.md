@@ -75,29 +75,6 @@ time rqw -e https://ja-dbpedia.egpl.dev/sparql -Q 'SELECT ?o WHERE {
 } LIMIT 10'
 ```
 
-## Layout
-
-```text
-cloudflare/
-├── mise.toml                      # tasks: store → image → registry → terraform
-├── container/
-│   └── Dockerfile                 # oxigraph + the store; build context is ../docker-compose/store
-├── worker/
-│   ├── src/index.ts               # gateway, plus the Durable Object the container attaches to
-│   ├── src/sparql.ts              # query inspection (read-only guarantee, cost heuristics)
-│   ├── src/index.html             # notice page, inlined into the bundle at build time
-│   ├── test/                      # vp test (Vitest)
-│   └── vite.config.ts             # Vite+: fmt / lint / type-check config
-└── terraform/
-    ├── .tflint.hcl                # terraform ruleset at the all preset
-    ├── main.tf                    # worker, version, deployment, custom domain
-    ├── zone.tf                    # optional: the zone itself
-    ├── container.tf               # container application (see the caveat below)
-    ├── security.tf                # WAF and rate limiting rulesets
-    ├── variables.tf / outputs.tf
-    └── scripts/container-app.sh
-```
-
 ## Operations
 
 ### Updating the dataset

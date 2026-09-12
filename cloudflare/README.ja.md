@@ -69,29 +69,6 @@ time rqw -e https://ja-dbpedia.egpl.dev/sparql -Q 'SELECT ?o WHERE {
 } LIMIT 10'
 ```
 
-## ディレクトリ
-
-```text
-cloudflare/
-├── mise.toml                      # タスク定義: store → image → registry → terraform
-├── container/
-│   └── Dockerfile                 # oxigraph + ストア。ビルドコンテキストは ../docker-compose/store
-├── worker/
-│   ├── src/index.ts               # ゲートウェイとコンテナが紐づく Durable Object
-│   ├── src/sparql.ts              # クエリ検査（読み取り専用の担保・コスト推定）
-│   ├── src/index.html             # 告知ページ。ビルド時にバンドルへ埋め込まれる
-│   ├── test/                      # vp test (Vitest)
-│   └── vite.config.ts             # Vite+ の fmt / lint / 型チェック設定
-└── terraform/
-    ├── .tflint.hcl                # terraform ruleset を all プリセットで
-    ├── main.tf                    # worker・version・deployment・カスタムドメイン
-    ├── zone.tf                    # 任意: ゾーンそのもの
-    ├── container.tf               # コンテナアプリケーション（後述の制約あり）
-    ├── security.tf                # WAF とレート制限のルールセット
-    ├── variables.tf / outputs.tf
-    └── scripts/container-app.sh
-```
-
 ## 運用
 
 ### データセットの更新
