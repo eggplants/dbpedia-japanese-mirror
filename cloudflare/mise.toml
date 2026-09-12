@@ -74,16 +74,30 @@ dir = "{{config_root}}"
 run = '''
 #!/usr/bin/env bash
 set -euo pipefail
-docker build -f container/Dockerfile -t "${IMAGE}" "${STORE_DIR}"
-size="$(docker image inspect "${IMAGE}" | jq -r '.[0].Size' | numfmt --to=iec)"
-echo "[INFO] Image ${IMAGE} is ${size}. Keep this under container_disk_mb in terraform.tfvars."
+scripts/stage-layers.sh "${STORE_DIR}/db" container/context
+docker build -f container/Dockerfile -t "${IMAGE}" container/context
+pushed="$(docker image inspect "${IMAGE}" | jq -r '.[0].Size' | numfmt --to=si)"
+unpacked="$(du -sb container/context | cut -f1 | numfmt --to=si)"
+echo "[INFO] Image ${IMAGE}: ${pushed}B to push, about ${unpacked}B unpacked. Keep the unpacked size under container_disk_mb in terraform.tfvars."
 '''
 
 [tasks.push]
 description = "Push the image to the Cloudflare managed registry"
 depends = ["image"]
 dir = "{{config_root}}"
-run = "wrangler containers push \"${IMAGE}\""
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+for attempt in 1 2 3 4 5; do
+  if CLOUDFLARE_API_TOKEN="$(scripts/cf-token.sh)" wrangler containers push "${IMAGE}"; then
+    exit 0
+  fi
+  echo "[WARN] Push attempt ${attempt} failed; waiting for the registry to finish committing layers before retrying" >&2
+  sleep 60
+done
+echo "[ERROR] Push still failing after 5 attempts" >&2
+exit 1
+'''
 
 [tasks.init]
 description = "terraform init"
