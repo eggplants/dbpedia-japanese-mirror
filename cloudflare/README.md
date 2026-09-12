@@ -90,13 +90,13 @@ mise run deploy # the image is tagged with DUMP_VERSION
 
 ### Cost
 
-| | Always on | `sleep_after = 20m`, busy 20% of the day |
+| | Always on | `sleep_after = 20m`, 20%/d |
 | --- | ---: | ---: |
 | Memory (9 GiB, $0.081/h) | $58.32 | $11.66 |
 | Disk (18 GB, $0.0045/h) | $3.63 | $0.73 |
 | CPU (1 vCPU, $0.072/h active, assuming 10% active) | $5.18 | $1.04 |
 | Workers Paid | $5.00 | $5.00 |
-| **Total** | **about $72/month** | **about $18/month** |
+| **Total** | **~$72/mo** | **~$18/mo** |
 
 ### Teardown
 
