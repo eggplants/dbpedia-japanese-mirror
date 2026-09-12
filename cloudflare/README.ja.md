@@ -4,8 +4,6 @@
 
 ## 構成
 
-[`docker-compose/`](../docker-compose/README.ja.md) が作ったストアをコンテナイメージに焼き込み、Cloudflare Containers で動かす。その前段に Worker を置き、公開されるのは Worker だけにする。
-
 ```mermaid
 flowchart TD
     subgraph build["ビルド"]
@@ -38,6 +36,8 @@ flowchart TD
     client --> edge
     build -.->|"terraform apply"| cf
 ```
+
+![Terraform のリソース。ゾーンにはカスタムドメイン、URL 正規化、WAF とレート制限のルールセット。Workers には Worker、その Durable Object クラス、バージョン、デプロイ、コンテナ](diagram/architecture.svg)
 
 ## 前提
 

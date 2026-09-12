@@ -1,0 +1,5 @@
+allowBuilds:
+  # puppeteer's postinstall downloads a browser. That is done explicitly by the
+  # `generate` script instead, so that `vp install` (which lint runs in CI)
+  # stays a plain package install.
+  puppeteer: false

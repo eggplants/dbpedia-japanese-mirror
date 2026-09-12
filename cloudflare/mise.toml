@@ -144,10 +144,16 @@ description = "Build and push the image, then apply"
 dir = "{{config_root}}"
 run = ["mise run push", "mise run apply"]
 
+[tasks.diagram]
+description = "Draw the Terraform resources as diagram/architecture.{mmd,svg}"
+depends = ["init"]
+dir = "{{config_root}}/diagram"
+run = ["vp install --frozen-lockfile", "vp run generate"]
+
 [tasks.clean]
 description = "Remove the Worker build output"
 dir = "{{config_root}}"
-run = "rm -rf worker/dist worker/node_modules"
+run = "rm -rf worker/dist worker/node_modules diagram/node_modules"
 
 [tasks."fmt:mise"]
 run = "mise fmt"
@@ -191,6 +197,16 @@ description = "Format check, lint and type check the Worker"
 dir = "{{config_root}}/worker"
 run = ["vp install --frozen-lockfile", "vp check"]
 
+[tasks."fmt:diagram"]
+description = "Format and lint --fix the diagram generator"
+dir = "{{config_root}}/diagram"
+run = ["vp install --frozen-lockfile", "vp check --fix"]
+
+[tasks."lint:diagram"]
+description = "Format check and lint the diagram generator"
+dir = "{{config_root}}/diagram"
+run = ["vp install --frozen-lockfile", "vp check"]
+
 [tasks."lint:shell"]
 dir = "{{config_root}}"
 run = '''
@@ -209,6 +225,7 @@ depends = [
   "fmt:terraform",
   "fmt:tflint",
   "fmt:worker",
+  "fmt:diagram",
 ]
 
 [tasks.lint]
@@ -219,6 +236,7 @@ depends = [
   "lint:tflint",
   "lint:shell",
   "lint:worker",
+  "lint:diagram",
   "test",
 ]
 

@@ -4,8 +4,6 @@
 
 ## Overview
 
-The store built by [`docker-compose/`](../docker-compose/README.md) is baked into a container image and run on Cloudflare Containers. A Worker sits in front of it, and the Worker is the only thing the public can reach.
-
 ```mermaid
 flowchart TD
     subgraph build["Build"]
@@ -38,6 +36,8 @@ flowchart TD
     client --> edge
     build -.->|"terraform apply"| cf
 ```
+
+![The Terraform resources: the custom domain, URL normalization, WAF and rate-limit rulesets in the zone; the Worker, its Durable Object class, version, deployment and container in Workers](diagram/architecture.svg)
 
 ## Requirements
 
