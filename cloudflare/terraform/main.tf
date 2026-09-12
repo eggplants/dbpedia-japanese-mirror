@@ -159,6 +159,19 @@ resource "cloudflare_worker_version" "sparql" {
   }
 
   depends_on = [terraform_data.worker_bootstrap]
+
+  # The provider reads computed binding fields (database_id, namespace_id,
+  # script_name, an empty `simple` on non-ratelimit bindings) back into state
+  # in a shape that never matches the config, and any binding diff forces a
+  # new version — so without this every plan replaces the version and its
+  # deployment (cloudflare/terraform-provider-cloudflare#7281, #7345). A new
+  # bundle, dataset or image still replaces the version through modules and
+  # annotations. After changing only a binding value (a rate limit, pool
+  # size, TTL), force it with:
+  #   terraform apply -replace=cloudflare_worker_version.sparql
+  lifecycle {
+    ignore_changes = [bindings]
+  }
 }
 
 resource "cloudflare_workers_deployment" "sparql" {
