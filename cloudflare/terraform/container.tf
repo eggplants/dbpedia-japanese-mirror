@@ -38,7 +38,7 @@ resource "terraform_data" "container_app" {
 
   provisioner "local-exec" {
     command     = "${path.module}/scripts/container-app.sh apply"
-    interpreter = ["/usr/bin/env", "bash"]
+    interpreter = ["/usr/bin/env", "bash", "-c"]
     environment = {
       CF_ACCOUNT_ID    = self.triggers_replace.account_id
       CF_APP_NAME      = self.triggers_replace.app_name
@@ -55,7 +55,7 @@ resource "terraform_data" "container_app" {
   provisioner "local-exec" {
     when        = destroy
     command     = "${path.module}/scripts/container-app.sh destroy"
-    interpreter = ["/usr/bin/env", "bash"]
+    interpreter = ["/usr/bin/env", "bash", "-c"]
     on_failure  = continue
     environment = {
       CF_ACCOUNT_ID = self.triggers_replace.account_id
