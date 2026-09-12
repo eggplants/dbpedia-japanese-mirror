@@ -1,12 +1,12 @@
 [tools]
 actionlint = "latest"
-"aqua:azu/dockerfile-pin" = "latest"
-claude = "latest"
-"github:k1LoW/mo" = "latest"
+"aqua:azu/dockerfile-pin" = "latest" # [skip ci]
+claude = "latest"                    # [skip ci]
+"github:k1LoW/mo" = "latest"         # [skip ci]
 markdownlint-cli2 = "latest"
-pinact = "latest"
-pipx = "latest"
-"pipx:rqw" = "latest"
+pinact = "latest"                    # [skip ci]
+pipx = "latest"                      # [skip ci]
+"pipx:rqw" = "latest"                # [skip ci]
 
 [settings]
 minimum_release_age = "7d"
