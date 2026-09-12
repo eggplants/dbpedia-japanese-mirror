@@ -1,6 +1,8 @@
 # Host DBpedia Japanese SPARQL Endpoint everywhere
 
-[![Website](https://img.shields.io/website?label=ja-dbpedia.egpl.dev&url=https%3A%2F%2Fja-dbpedia.egpl.dev)](https://ja-dbpedia.egpl.dev)
+[![Website](https://img.shields.io/website?label=ja-dbpedia.egpl.dev&url=https%3A%2F%2Fja-dbpedia.egpl.dev)](https://ja-dbpedia.egpl.dev) [![ci](https://github.com/eggplants/dbpedia-japanese-mirror/actions/workflows/ci.yaml/badge.svg)](https://github.com/eggplants/dbpedia-japanese-mirror/actions/workflows/ci.yaml)
+
+Online deployment on Cloudflare: <https://ja-dbpedia.egpl.dev/>
 
 | On | README |
 | - | - |
