@@ -41,24 +41,24 @@ flowchart TD
 
 ## Requirements
 
-- A Cloudflare account on the **Workers Paid** plan (Containers are not on the free plan)
+- A Cloudflare account on the **Workers Paid** plan
 - The endpoint's domain registered as a zone in that same account, with its nameservers pointing at Cloudflare
-- [mise](https://mise.jdx.dev/), Docker, `curl`, `jq` (Terraform and Node.js come from `mise.toml`)
+- [mise](https://mise.jdx.dev/) / Docker / `curl` / `jq`
 - A loaded store under `../docker-compose/store/db`
-
-Permissions the API token needs:
+  - `cd ../docker-compose && docker compose up --build`
 
 | Scope | Permission |
 | --- | --- |
-| Account | Workers Scripts:Edit |
-| Account | Cloudflare Containers:Edit |
-| Zone | Zone:Read, Zone Settings:Edit, Firewall Services:Edit |
+| Account | Workers Scripts Write, Workers Containers Write |
+| Zone | Zone Read, Zone Settings Write, Sanitize Write (URL normalization), Firewall Services Write, Zone WAF Write, DNS Write, Workers Routes Write |
 
 ## Quickstart
 
 ```bash
 cd cloudflare
 mise trust
+cf auth login
+scripts/create-api-token.sh <account id> <zone id> # writes .env
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 $EDITOR terraform/terraform.tfvars
 

@@ -9,8 +9,8 @@ terraform {
   }
 }
 
-# CLOUDFLARE_API_TOKEN is read from the environment. The token needs:
-#   Account : Workers Scripts:Edit, Workers R2 Storage:Edit (optional),
-#             Containers:Edit (called "Cloudflare Containers" in the UI)
-#   Zone    : Zone:Read, Zone Settings:Edit, Cache Rules:Edit, Firewall Services:Edit
+# CLOUDFLARE_API_TOKEN is read from the environment (mise.toml sets it from
+# ../.env). It has to be an API token, not the cf CLI's OAuth token: the zone
+# rules need permissions OAuth cannot grant. ../scripts/create-api-token.sh
+# creates it with the permission groups it needs.
 provider "cloudflare" {}

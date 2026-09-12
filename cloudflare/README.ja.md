@@ -41,24 +41,19 @@ flowchart TD
 
 ## 前提
 
-- **Workers Paid** プランの Cloudflare アカウント（Containers は無料プランでは使えない）
+- **Workers Paid** プランの Cloudflare アカウント
 - 公開ホスト名のドメインが同じアカウントのゾーンとして登録され、ネームサーバが Cloudflare を向いていること
-- [mise](https://mise.jdx.dev/)、Docker、`curl`、`jq`（Terraform と Node.js は `mise.toml` が入れる）
+- [mise](https://mise.jdx.dev/) / Docker / `curl` / `jq`
 - `../docker-compose/store/db` にロード済みのストアがあること
-
-API トークンに必要な権限:
-
-| スコープ | 権限 |
-| --- | --- |
-| アカウント | Workers Scripts:Edit |
-| アカウント | Cloudflare Containers:Edit |
-| ゾーン | Zone:Read, Zone Settings:Edit, Firewall Services:Edit |
+  - `cd ../docker-compose && docker compose up --build`
 
 ## クイックスタート
 
 ```bash
 cd cloudflare
 mise trust
+cf auth login
+scripts/create-api-token.sh <account id> <zone id> # .env に書き込む
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 $EDITOR terraform/terraform.tfvars
 
