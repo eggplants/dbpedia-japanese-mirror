@@ -6,6 +6,7 @@ vite-plus = "https://github.com/markmals/mise-vite-plus"
 use_git_credentials = true
 
 [tools]
+claude = "latest"
 markdownlint-cli2 = "latest"
 node = "latest"
 "npm:cf" = "latest"
