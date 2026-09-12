@@ -209,16 +209,16 @@ variable "rate_limit_heavy" {
 
 variable "zone_rate_limit_requests" {
   type        = number
-  default     = 300
-  description = "Zone-level rate limiting rule: requests per 60 s per IP before the rule blocks."
+  default     = 50
+  description = "Zone-level rate limiting rule: requests per 10 s per IP, per colo, before the rule blocks."
 }
 
 variable "zone_rate_limit_mitigation_timeout" {
   type        = number
-  default     = 60
+  default     = 10
   description = <<-EOT
-    How long the block lasts once the zone rate limit trips. The Free plan caps
-    this at 10 seconds and the counting period at 60; Pro allows up to an hour.
+    How long the block lasts once the zone rate limit trips, in seconds. The
+    Free plan only allows 10; Pro allows up to an hour, Business up to a day.
   EOT
 }
 

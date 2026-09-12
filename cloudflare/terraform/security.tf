@@ -76,8 +76,10 @@ resource "cloudflare_ruleset" "ratelimit" {
       action     = "block"
 
       ratelimit = {
-        characteristics     = ["ip.src", "cf.colo.id"]
-        period              = 60
+        characteristics = ["ip.src", "cf.colo.id"]
+        # 10 s is the only counting period every plan allows (60 s needs
+        # Business), so the ceiling is expressed per 10 s.
+        period              = 10
         requests_per_period = var.zone_rate_limit_requests
         mitigation_timeout  = var.zone_rate_limit_mitigation_timeout
       }

@@ -38,6 +38,6 @@ rate_limit_burst     = 30
 rate_limit_sustained = 120
 rate_limit_heavy     = 10
 
-# Zone-level ceiling. On the Free plan mitigation_timeout has to be 10.
-zone_rate_limit_requests           = 300
-zone_rate_limit_mitigation_timeout = 60
+# Zone-level ceiling, counted per 10 s. On the Free plan mitigation_timeout has to be 10.
+zone_rate_limit_requests           = 50
+zone_rate_limit_mitigation_timeout = 10
