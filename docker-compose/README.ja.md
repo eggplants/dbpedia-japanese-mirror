@@ -216,28 +216,36 @@ docker run --rm -v "$PWD/store:/x" alpine sh -c 'rm -rf /x/* /x/.[!.]*'
 
 ## トラブルシューティング
 
-**`Error: IO error: While lock file: /store/db/LOCK: Resource temporarily unavailable`**
+### `Error: IO error: While lock file: /store/db/LOCK: Resource temporarily unavailable`
+
 読み書きモードの `serve` がストアを掴んだまま loader が開こうとしている。`docker compose stop serve` してからロードし、その後起動する。
 
-**ロードしてもトリプル数が増えない**
+### ロードしてもトリプル数が増えない
+
 起動中のサーバが、開いた時点のスナップショットから答えている。`docker compose restart serve` する。
 
-**`[WARN] Skipping N .bz2 file(s): oxigraph cannot read bzip2.`**
+### `[WARN] Skipping N .bz2 file(s): oxigraph cannot read bzip2.`
+
 ダウンロード時に `RECOMPRESS_BZ2_TO_GZ` が `false` だった。`true` にして `docker compose up download` をやり直す。変換済みのファイルは飛ばされる。
 
-**`Not able to guess the file format from file name extension 'bz2'`**
+### `Not able to guess the file format from file name extension 'bz2'`
+
 同じ原因を oxigraph 側から見たもの。`.bz2` のファイルが `oxigraph load` に直接渡っている。
 
-**`[ERROR] No loadable file found under /data/<version>`**
+### `[ERROR] No loadable file found under /data/<version>`
+
 ダウンロードが `.ttl` / `.nt`（必要に応じて `.gz`）を 1 つも作れていない。`download` のログと、`DUMP_VERSION` が実際に取得したディレクトリと一致しているかを確認する。
 
-**`FROM` を書かないクエリが何も返さない**
+### `FROM` を書かないクエリが何も返さない
+
 全トリプルは名前付きグラフ `GRAPH_URI` に入っており、デフォルトグラフは空。`OXIGRAPH_SERVE_OPTS` に `--union-default-graph` を残すか、`FROM <http://ja.dbpedia.org>` を書く。
 
-**SPARQL UPDATE が `403` を返す**
+### SPARQL UPDATE が `403` を返す
+
 `serve-read-only` では想定どおりの動作。本当に書き込ませたいなら `OXIGRAPH_SERVE_CMD=serve` にする。
 
-**loader がメモリ不足になる**
+### loader がメモリ不足になる
+
 `LOAD_BATCH_SIZE` を下げる。1 バッチのファイルは並列に読まれるので、ファイル数を減らせばピークが下がる。
 
 ## ライセンス

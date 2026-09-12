@@ -101,19 +101,24 @@ wrangler containers images delete
 
 ## トラブルシューティング
 
-**`No Durable Object namespace for class 'OxigraphContainer'`**
+### `No Durable Object namespace for class 'OxigraphContainer'`
+
 Worker バージョンのデプロイ前にコンテナアプリケーションが動いた。もう一度 `terraform apply` すればよい。通常は `depends_on` で順序が付くが、途中まで apply された状態からだとこうなることがある。
 
-**しばらく放置したあとの最初のクエリが数秒かかる**
+### しばらく放置したあとの最初のクエリが数秒かかる
+
 コールドスタート。`container_sleep_after` を伸ばすか、cron トリガーで軽いクエリを投げて温め続ける。
 
-**どのクエリも空の結果しか返らない**
+### どのクエリも空の結果しか返らない
+
 名前付きグラフにロードしたのにサーバが `--union-default-graph` なしで動いている（またはその逆）。`container/Dockerfile` と `../docker-compose/.env` の `GRAPH_URI` は揃っている必要がある。
 
-**コンテナ起動時に `disk size exceeds instance limit`**
+### コンテナ起動時に `disk size exceeds instance limit`
+
 イメージが `container_disk_mb` より大きい。`mise run image` が展開後のサイズを表示する（push されるサイズはレイヤが圧縮されるぶん小さい）ので、上限 20000 と突き合わせ、`container_memory_mib` はその半分以上にする。
 
-**普通に使っているのに 429 が返る**
+### 普通に使っているのに 429 が返る
+
 `LIMIT` の無いクエリや `COUNT`・`REGEX` を含むクエリは `rate_limit_heavy`（既定で毎分 10）から引かれる。`LIMIT` を付けるか、この変数を上げる。
 
 ## ライセンス

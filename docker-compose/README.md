@@ -216,28 +216,36 @@ docker run --rm -v "$PWD/store:/x" alpine sh -c 'rm -rf /x/* /x/.[!.]*'
 
 ## Troubleshooting
 
-**`Error: IO error: While lock file: /store/db/LOCK: Resource temporarily unavailable`**
+### `Error: IO error: While lock file: /store/db/LOCK: Resource temporarily unavailable`
+
 A read-write `serve` is holding the store while the loader tries to open it. Run `docker compose stop serve`, load, then start it again.
 
-**The triple count does not grow after a load**
+### The triple count does not grow after a load
+
 The running server is answering from the snapshot it took when it opened the store. Run `docker compose restart serve`.
 
-**`[WARN] Skipping N .bz2 file(s): oxigraph cannot read bzip2.`**
+### `[WARN] Skipping N .bz2 file(s): oxigraph cannot read bzip2.`
+
 `RECOMPRESS_BZ2_TO_GZ` was `false` at download time. Set it to `true` and run `docker compose up download` again; the files already converted are skipped.
 
-**`Not able to guess the file format from file name extension 'bz2'`**
+### `Not able to guess the file format from file name extension 'bz2'`
+
 The same cause seen from oxigraph's side. A `.bz2` file is being handed straight to `oxigraph load`.
 
-**`[ERROR] No loadable file found under /data/<version>`**
+### `[ERROR] No loadable file found under /data/<version>`
+
 The download produced no `.ttl` / `.nt` (optionally `.gz`) at all. Check the `download` log, and that `DUMP_VERSION` matches the directory it actually fetched.
 
-**Queries without `FROM` return nothing**
+### Queries without `FROM` return nothing
+
 Every triple is in the named graph `GRAPH_URI` and the default graph is empty. Keep `--union-default-graph` in `OXIGRAPH_SERVE_OPTS`, or write `FROM <http://ja.dbpedia.org>`.
 
-**SPARQL UPDATE returns `403`**
+### SPARQL UPDATE returns `403`
+
 Expected under `serve-read-only`. Set `OXIGRAPH_SERVE_CMD=serve` if you really want writes.
 
-**The loader runs out of memory**
+### The loader runs out of memory
+
 Lower `LOAD_BATCH_SIZE`. The files in a batch are read in parallel, so fewer files means a lower peak.
 
 ## License
