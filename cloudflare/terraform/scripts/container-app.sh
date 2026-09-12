@@ -104,6 +104,11 @@ apply() {
   local application_id
   application_id="$(find_application_id)"
 
+  # This is the shape `wrangler deploy` sends for a container attached to a
+  # Durable Object class: a scheduler-backed ("default") application that is
+  # associated with the namespace through `durable_objects`. The newer
+  # `scheduling_policy: "durable_object"` mode takes no configuration at all
+  # (images move into the Worker version) and rejects this payload.
   if [[ -z "${application_id}" ]]; then
     echo "[INFO] Creating container application '${CF_APP_NAME}'"
     local payload
@@ -114,9 +119,11 @@ apply() {
       --arg namespace_id "${namespace_id}" \
       '{
         name: $name,
-        scheduling_policy: "durable_object",
+        scheduling_policy: "default",
         instances: 0,
         max_instances: $max_instances,
+        constraints: { tiers: [1, 2] },
+        rollout_active_grace_period: 0,
         configuration: $configuration,
         durable_objects: { namespace_id: $namespace_id }
       }')"
@@ -133,7 +140,7 @@ apply() {
     '{
       configuration: $configuration,
       max_instances: $max_instances,
-      scheduling_policy: "durable_object"
+      scheduling_policy: "default"
     }')"
   cf_api PATCH "/accounts/${CF_ACCOUNT_ID}/containers/applications/${application_id}" "${patch}" > /dev/null
 
