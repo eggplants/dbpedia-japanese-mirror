@@ -22,12 +22,13 @@ dataset_profile = "core"
 container_image = "dbpedia-ja-oxigraph:20221201"
 
 # Sizing. Measured at 114 bytes/triple in the default graph and roughly twice
-# that in a named graph; the core profile is around 54M triples. Serving needs
-# very little memory (64 MB RSS on a 34M-triple store), so memory here is really
-# page cache for the store.
+# that in a named graph; the core profile is around 54M triples and unpacks to
+# about 16.3 GB on disk. Serving needs very little memory (64 MB RSS on a
+# 34M-triple store), but custom instance types allow at most 2 GB of disk per
+# 1 GiB of memory, so memory follows disk; the surplus is page cache.
 container_vcpu          = 1
-container_memory_mib    = 2048
-container_disk_mb       = 16000
+container_memory_mib    = 9216
+container_disk_mb       = 18000
 container_max_instances = 3
 container_sleep_after   = "20m"
 container_pool_size     = 1

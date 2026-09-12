@@ -91,23 +91,25 @@ variable "container_vcpu" {
 
 variable "container_memory_mib" {
   type        = number
-  default     = 2048
+  default     = 9216
   description = <<-EOT
-    Memory per instance in MiB. Maximum 12288.
+    Memory per instance in MiB. Maximum 12288, at least 3072 per vCPU, and at
+    least half of container_disk_mb (custom instance types allow at most 2 GB
+    of disk per 1 GiB of memory), which is what sets the default.
     Oxigraph itself needs very little (a 34M-triple store serves point lookups
-    at ~64 MB RSS); the rest buys page cache for the store, so raise this before
-    raising vCPU if queries feel I/O bound.
+    at ~64 MB RSS); the rest buys page cache for the store.
   EOT
 }
 
 variable "container_disk_mb" {
   type        = number
-  default     = 16000
+  default     = 18000
   description = <<-EOT
-    Disk per instance in MB. Must exceed the image size. Maximum 20000.
-    The core profile in a named graph measures around 13 GB; loading into the
-    default graph instead roughly halves that. The `ja` and `full` profiles do
-    not fit under the 20 GB ceiling at all.
+    Disk per instance in MB. Must exceed the unpacked image size (the pushed
+    size is smaller because layers are compressed). Maximum 20000.
+    The core profile in a named graph unpacks to around 16.3 GB; loading into
+    the default graph instead roughly halves that. The `ja` and `full` profiles
+    do not fit under the 20 GB ceiling at all.
   EOT
 }
 

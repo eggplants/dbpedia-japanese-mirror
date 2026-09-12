@@ -113,14 +113,13 @@ mise run deploy # the image is tagged with DUMP_VERSION
 
 ### Cost
 
-Memory and disk are billed for as long as an instance is running; CPU only for what it actually uses. At `1 vCPU / 2 GiB / 16 GB`:
-
 | | Always on | `sleep_after = 20m`, busy 20% of the day |
 | --- | ---: | ---: |
-| Memory | $12.96 | $2.60 |
-| Disk | $2.90 | $0.58 |
+| Memory (9 GiB, $0.081/h) | $58.32 | $11.66 |
+| Disk (18 GB, $0.0045/h) | $3.63 | $0.73 |
+| CPU (1 vCPU, $0.072/h active, assuming 10% active) | $5.18 | $1.04 |
 | Workers Paid | $5.00 | $5.00 |
-| **Total** | **about $21/month** | **about $8/month** |
+| **Total** | **about $72/month** | **about $18/month** |
 
 ### Teardown
 
@@ -141,7 +140,7 @@ Cold start. Raise `container_sleep_after`, or keep an instance warm with a cron 
 The data was loaded into a named graph but the server is running without `--union-default-graph`, or the other way round. `container/Dockerfile` and `GRAPH_URI` in `../docker-compose/.env` have to agree.
 
 **`disk size exceeds instance limit` when the container starts**
-The image is larger than `container_disk_mb`. `mise run image` prints the image size; check it against the 20000 ceiling.
+The image is larger than `container_disk_mb`. `mise run image` prints the unpacked size (the pushed size is smaller because layers are compressed); check it against the 20000 ceiling and keep `container_memory_mib` at least half of it.
 
 **429 during ordinary use**
 Queries without a `LIMIT`, and queries containing `COUNT` or `REGEX`, are drawn from `rate_limit_heavy` (10 per minute by default). Add a `LIMIT`, or raise that variable.

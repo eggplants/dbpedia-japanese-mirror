@@ -91,8 +91,8 @@ apply() {
   configuration="$(jq -n \
     --arg image "${image}" \
     --argjson vcpu "${CF_VCPU:-1}" \
-    --argjson memory_mib "${CF_MEMORY_MIB:-2048}" \
-    --argjson disk_mb "${CF_DISK_MB:-12000}" \
+    --argjson memory_mib "${CF_MEMORY_MIB:-9216}" \
+    --argjson disk_mb "${CF_DISK_MB:-18000}" \
     '{
       image: $image,
       vcpu: $vcpu,
