@@ -2,7 +2,7 @@ FROM ghcr.io/oxigraph/oxigraph:0.5.11@sha256:7532c1f9aa5f28c0dc6a4243198f7f61440
 
 # The oxigraph image ships no shell, so the binary is copied onto a base that
 # has one. It is a glibc build, hence Debian rather than Alpine.
-FROM debian:bookworm-slim@sha256:88200866dfff7ea7f5cbcb6ec7c8a701889efe6fe859fe64d6990e4b07ea4171
+FROM debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
 
 COPY --from=oxigraph /usr/local/bin/oxigraph /usr/local/bin/oxigraph
 COPY load.sh /load.sh
