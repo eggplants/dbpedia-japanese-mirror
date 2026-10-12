@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DBpedia Japanese SPARQL mirror (suspended)</title>
+    <meta
+      name="description"
+      content="This unofficial mirror of DBpedia Japanese is suspended. Use the official endpoint at https://ja.dbpedia.org/sparql."
+    />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="https://ja.dbpedia.org/sparql" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🗾</text></svg>"
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --fg: #16181d;
+        --muted: #5b6270;
+        --bg: #ffffff;
+        --panel: #f5f6f8;
+        --border: #d8dce3;
+        --accent: #0b6ea8;
+        --warn-bg: #fff6e0;
+        --warn-border: #e0b44a;
+        --warn-fg: #6b4c05;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #e6e8ec;
+          --muted: #98a0ae;
+          --bg: #14161a;
+          --panel: #1c1f25;
+          --border: #2e333c;
+          --accent: #58b6e8;
+          --warn-bg: #2b2312;
+          --warn-border: #7a6224;
+          --warn-fg: #e8cf90;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          system-ui,
+          -apple-system,
+          "Hiragino Sans",
+          "Noto Sans JP",
+          sans-serif;
+        line-height: 1.7;
+      }
+      .wrap {
+        max-width: 48rem;
+        margin: 0 auto;
+        padding: 2.5rem 1rem 3rem;
+      }
+      h1 {
+        font-size: 1.35rem;
+        margin: 0 0 1.25rem;
+      }
+      a {
+        color: var(--accent);
+      }
+      .notice {
+        background: var(--warn-bg);
+        border: 1px solid var(--warn-border);
+        color: var(--warn-fg);
+        border-radius: 0.5rem;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.25rem;
+      }
+      .notice strong {
+        display: block;
+        margin-bottom: 0.3rem;
+      }
+      .notice p {
+        margin: 0.4rem 0 0;
+      }
+      .en {
+        opacity: 0.85;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.9em;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 0.25rem;
+        padding: 0.05rem 0.35rem;
+        overflow-wrap: anywhere;
+      }
+      dl {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 0.35rem 1.25rem;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        padding: 1rem 1.15rem;
+        margin: 0 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      dt {
+        color: var(--muted);
+      }
+      dd {
+        margin: 0;
+        min-width: 0;
+      }
+      footer {
+        border-top: 1px solid var(--border);
+        margin-top: 2rem;
+        padding-top: 1rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <h1>DBpedia Japanese SPARQL mirror</h1>
+
+      <div class="notice">
+        <strong>⏸️ このミラーは停止中です</strong>
+        <p>
+          公式の DBpedia Japanese SPARQL
+          エンドポイントが再稼働したため、この非公式ミラーは運用を停止しました。
+          今後は公式のエンドポイント
+          <a href="https://ja.dbpedia.org/sparql">https://ja.dbpedia.org/sparql</a>
+          をご利用ください。スクリプトやアプリケーションでこのミラーの URL
+          を指定している場合は、公式の URL に置き換えてください。
+        </p>
+        <p class="en">
+          <strong style="display: inline">This mirror is suspended.</strong>
+          The official DBpedia Japanese SPARQL endpoint is back online, so this unofficial mirror is
+          no longer served. Please use
+          <a href="https://ja.dbpedia.org/sparql">https://ja.dbpedia.org/sparql</a> instead, and
+          update any scripts or applications that point here.
+        </p>
+      </div>
+
+      <dl>
+        <dt>公式 / Official</dt>
+        <dd>
+          <a href="https://ja.dbpedia.org/sparql"><code>https://ja.dbpedia.org/sparql</code></a>
+        </dd>
+        <dt>停止中 / Suspended</dt>
+        <dd><code>__ENDPOINT__</code></dd>
+        <dt>ダンプ / Dumps</dt>
+        <dd><a href="https://ja.dbpedia.org/dumps/">https://ja.dbpedia.org/dumps/</a></dd>
+      </dl>
+
+      <p>ご利用いただきありがとうございました。 / Thank you for using this mirror.</p>
+
+      <footer>Deployment: <a href="__SOURCE_REPOSITORY__">__SOURCE_REPOSITORY__</a></footer>
+    </div>
+  </body>
+</html>

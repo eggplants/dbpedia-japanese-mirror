@@ -14,6 +14,7 @@ import type { StopParams } from "@cloudflare/containers";
 import type { DurableObject } from "cloudflare:workers";
 
 import landingPage from "./index.html";
+import suspendedPage from "./suspended.html";
 import { rawPathOf } from "./http.ts";
 import {
   isFederated,
@@ -37,6 +38,8 @@ export interface Env {
   CACHE_TTL?: string;
   BROWSER_TTL?: string;
   CONTAINER_POOL_SIZE?: string;
+  /** "true" once the mirror is retired; see `suspended` in ../../terraform/variables.tf. */
+  MIRROR_SUSPENDED?: string;
 }
 
 /** A request as read out of the SPARQL protocol; `query` is null when absent. */
@@ -86,6 +89,9 @@ export class OxigraphContainer extends Container<Env> {
 const QUERY_PATHS = new Set(["/sparql"]);
 const PAGE_PATHS = new Set(["/", "/index.html"]);
 
+/** Where clients are sent while the mirror is suspended. */
+const OFFICIAL_ENDPOINT = "https://ja.dbpedia.org/sparql";
+
 const DEFAULTS = {
   MAX_QUERY_BYTES: 8192,
   CACHE_TTL: 86400,
@@ -102,10 +108,16 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders() });
     }
     if (path === "/health") {
+      if (env.MIRROR_SUSPENDED === "true") {
+        return json({ ok: false, suspended: true, official: OFFICIAL_ENDPOINT }, 503);
+      }
       return json({ ok: true, dataset: env.DATASET_VERSION ?? null });
     }
     if (path === "/robots.txt") {
       return robotsTxt();
+    }
+    if (env.MIRROR_SUSPENDED === "true") {
+      return suspended(request, url, env, path);
     }
     if (PAGE_PATHS.has(path)) {
       return renderLandingPage(url, env);
@@ -219,6 +231,42 @@ function renderLandingPage(url: URL, env: Env): Response {
       "referrer-policy": "strict-origin-when-cross-origin",
     },
   });
+}
+
+/**
+ * While the mirror is suspended the container is gone, so nothing here may reach
+ * it. The page explains where to go instead; the endpoint answers 503 with the
+ * same pointer, as HTML for a browser and as the usual JSON error otherwise.
+ */
+function suspended(request: Request, url: URL, env: Env, path: string): Response {
+  const html = suspendedPage
+    .replaceAll("__ENDPOINT__", `${url.origin}/sparql`)
+    .replaceAll("__SOURCE_REPOSITORY__", env.SOURCE_REPOSITORY ?? "");
+  const pageHeaders = {
+    "content-type": "text/html; charset=utf-8",
+    "cache-control": "public, max-age=300",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "strict-origin-when-cross-origin",
+  };
+
+  if (PAGE_PATHS.has(path)) {
+    return new Response(html, { headers: pageHeaders });
+  }
+  if (!QUERY_PATHS.has(path)) {
+    return fail(404, "not_found", `This mirror is suspended. Use ${OFFICIAL_ENDPOINT} instead.`);
+  }
+  if ((request.headers.get("accept") ?? "").includes("text/html")) {
+    return new Response(html, {
+      status: 503,
+      headers: { ...pageHeaders, "cache-control": "no-store", ...corsHeaders() },
+    });
+  }
+  return fail(
+    503,
+    "mirror_suspended",
+    `This mirror is suspended now that the official endpoint is back. Use ${OFFICIAL_ENDPOINT} instead.`,
+    { link: `<${OFFICIAL_ENDPOINT}>; rel="alternate"` },
+  );
 }
 
 /**
