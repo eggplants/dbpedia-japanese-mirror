@@ -9,6 +9,9 @@ manage_zone = false
 
 source_repository = "https://github.com/eggplants/dbpedia-japanese-mirror"
 
+# Stop the container and serve a notice pointing at https://ja.dbpedia.org/sparql
+suspended = false
+
 # Use *.workers.dev domain
 enable_workers_dev = false
 

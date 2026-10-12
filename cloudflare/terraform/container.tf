@@ -17,7 +17,11 @@
 # If Cloudflare ships a first-class resource later, this file is the only thing
 # that needs to change.
 
+# Absent while the mirror is suspended: destroying it runs the destroy
+# provisioner below, which deletes the application and stops its instances.
 resource "terraform_data" "container_app" {
+  count = var.suspended ? 0 : 1
+
   triggers_replace = {
     account_id    = var.account_id
     app_name      = var.container_app_name
@@ -64,4 +68,11 @@ resource "terraform_data" "container_app" {
   }
 
   depends_on = [cloudflare_workers_deployment.sparql]
+}
+
+# The resource gained `count` for `suspended`; this keeps existing state from
+# being destroyed and recreated on the first apply after that change.
+moved {
+  from = terraform_data.container_app
+  to   = terraform_data.container_app[0]
 }

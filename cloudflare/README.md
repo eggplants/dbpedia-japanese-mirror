@@ -98,6 +98,10 @@ mise run deploy # the image is tagged with DUMP_VERSION
 | Workers Paid | $5.00 | $5.00 |
 | **Total** | **~$72/mo** | **~$18/mo** |
 
+### Suspending the mirror
+
+Set `suspended = true` in `terraform/terraform.tfvars` and run `mise run apply`. The container application is deleted, which stops its instances, and the Worker answers `/` with a notice pointing at the official endpoint (<https://ja.dbpedia.org/sparql>) and `/sparql` with a 503. The zone, the custom domain and the Durable Object class stay, so setting `suspended = false` and applying again brings the mirror back.
+
 ### Teardown
 
 ```bash

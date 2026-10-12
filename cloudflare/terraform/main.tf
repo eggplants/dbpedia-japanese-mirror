@@ -117,6 +117,11 @@ resource "cloudflare_worker_version" "sparql" {
         name = "CONTAINER_SLEEP_AFTER"
         text = var.container_sleep_after
       },
+      {
+        type = "plain_text"
+        name = "MIRROR_SUSPENDED"
+        text = tostring(var.suspended)
+      },
     ],
     [
       {
@@ -154,7 +159,7 @@ resource "cloudflare_worker_version" "sparql" {
   }
 
   annotations = {
-    workers_message = "dataset ${var.dataset_version}, image ${var.container_image}"
+    workers_message = var.suspended ? "suspended" : "dataset ${var.dataset_version}, image ${var.container_image}"
     workers_tag     = substr(local.bundle_sha, 0, 16)
   }
 
@@ -169,6 +174,8 @@ resource "cloudflare_worker_version" "sparql" {
   # annotations. After changing only a binding value (a rate limit, pool
   # size, TTL), force it with:
   #   terraform apply -replace=cloudflare_worker_version.sparql
+  # `suspended` is the exception: it is in the annotations so that flipping it
+  # replaces the version by itself.
   lifecycle {
     ignore_changes = [bindings]
   }
@@ -185,7 +192,7 @@ resource "cloudflare_workers_deployment" "sparql" {
   }]
 
   annotations = {
-    workers_message = "dataset ${var.dataset_version}"
+    workers_message = var.suspended ? "suspended" : "dataset ${var.dataset_version}"
   }
 }
 

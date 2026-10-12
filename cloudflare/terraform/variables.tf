@@ -60,6 +60,19 @@ variable "worker_name" {
   description = "Name of the Worker script."
 }
 
+variable "suspended" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    Retire the mirror without tearing the stack down. The container application
+    is deleted, which stops every instance and its billing, and the Worker
+    serves a notice pointing at the official endpoint (https://ja.dbpedia.org/sparql)
+    on / and a 503 on /sparql. The zone, the custom domain and the Durable
+    Object class stay, so setting this back to false brings the mirror back
+    with a plain apply.
+  EOT
+}
+
 # --- Container ---------------------------------------------------------------
 
 variable "container_image" {

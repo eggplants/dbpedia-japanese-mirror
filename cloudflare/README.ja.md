@@ -92,6 +92,10 @@ mise run deploy # イメージのタグは DUMP_VERSION
 | Workers Paid | $5.00 | $5.00 |
 | **合計** | **約 $72/月** | **約 $18/月** |
 
+### 一時停止
+
+`terraform/terraform.tfvars` で `suspended = true` にして `mise run apply` すると、コンテナアプリケーションを削除してインスタンスを止め、`/` では公式エンドポイント (<https://ja.dbpedia.org/sparql>) への案内ページを、`/sparql` では 503 を返すようになります。ゾーン・カスタムドメイン・Durable Object クラスは残るので、`suspended = false` に戻して `mise run apply` すれば再開できます。
+
 ### 撤去
 
 ```bash
