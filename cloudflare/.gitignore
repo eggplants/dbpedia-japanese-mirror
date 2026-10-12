@@ -1,3 +1,4 @@
 terraform.tfvars
 container/context/
 .wrangler/
+.cloudflare/cache/
