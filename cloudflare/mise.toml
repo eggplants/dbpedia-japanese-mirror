@@ -57,17 +57,29 @@ fi
 echo "[INFO] Store: ${STORE_DIR}/db ($(du -sh "${STORE_DIR}/db" | cut -f1))"
 '''
 
+[tasks."_install:worker"]
+hide = true
+dir = "{{config_root}}/worker"
+run = "vp install --frozen-lockfile"
+
+[tasks."_install:diagram"]
+hide = true
+dir = "{{config_root}}/diagram"
+run = "vp install --frozen-lockfile"
+
 [tasks.test]
 description = "Run the gateway unit tests"
+depends = ["_install:worker"]
 dir = "{{config_root}}/worker"
-run = ["vp install --frozen-lockfile", "vp test"]
+run = "vp test"
 
 [tasks.bundle]
 description = "Build the Worker bundle Terraform uploads"
+depends = ["_install:worker"]
 dir = "{{config_root}}/worker"
 sources = ["src/*", "package.json", "pnpm-lock.yaml"]
 outputs = ["dist/index.mjs"]
-run = ["vp install --frozen-lockfile", "vp run build"]
+run = "vp run build"
 
 [tasks.image]
 description = "Bake the Oxigraph store into a container image"
@@ -146,9 +158,9 @@ run = ["mise run push", "mise run apply"]
 
 [tasks.diagram]
 description = "Draw the Terraform resources as diagram/architecture.{mmd,svg}"
-depends = ["init"]
+depends = ["init", "_install:diagram"]
 dir = "{{config_root}}/diagram"
-run = ["vp install --frozen-lockfile", "vp run generate"]
+run = "vp run generate"
 
 [tasks.clean]
 description = "Remove the Worker build output"
@@ -189,23 +201,27 @@ run = ["tflint --init", "tflint --recursive --minimum-failure-severity=error"]
 
 [tasks."fmt:worker"]
 description = "Format, lint --fix and type check the Worker"
+depends = ["_install:worker"]
 dir = "{{config_root}}/worker"
-run = ["vp install --frozen-lockfile", "vp check --fix"]
+run = "vp check --fix"
 
 [tasks."lint:worker"]
 description = "Format check, lint and type check the Worker"
+depends = ["_install:worker"]
 dir = "{{config_root}}/worker"
-run = ["vp install --frozen-lockfile", "vp check"]
+run = "vp check"
 
 [tasks."fmt:diagram"]
 description = "Format and lint --fix the diagram generator"
+depends = ["_install:diagram"]
 dir = "{{config_root}}/diagram"
-run = ["vp install --frozen-lockfile", "vp check --fix"]
+run = "vp check --fix"
 
 [tasks."lint:diagram"]
 description = "Format check and lint the diagram generator"
+depends = ["_install:diagram"]
 dir = "{{config_root}}/diagram"
-run = ["vp install --frozen-lockfile", "vp check"]
+run = "vp check"
 
 [tasks."lint:shell"]
 dir = "{{config_root}}"
