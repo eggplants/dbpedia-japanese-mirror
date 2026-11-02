@@ -8,11 +8,11 @@
     "generate": "puppeteer browsers install chrome-headless-shell && node src/generate.mjs"
   },
   "devDependencies": {
-    "@cloudflare/component-icon": "^13.15.3",
+    "@cloudflare/component-icon": "^13.15.4",
     "@mermaid-js/mermaid-cli": "^12.0.0",
-    "puppeteer": "^25.12.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
+    "puppeteer": "^25.16.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "vite-plus": "1.0.0"
   },
   "devEngines": {

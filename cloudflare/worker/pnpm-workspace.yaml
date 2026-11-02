@@ -1,3 +1,6 @@
 allowBuilds:
   # The postinstall only checks that the platform binary matches.
   esbuild: true
+
+overrides:
+  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
