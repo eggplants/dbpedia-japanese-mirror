@@ -1,4 +1,4 @@
-FROM ghcr.io/oxigraph/oxigraph:0.5.11@sha256:7532c1f9aa5f28c0dc6a4243198f7f6144017fab7429bf6c164a89fec9411767
+FROM ghcr.io/oxigraph/oxigraph:0.5.13@sha256:260454ee29c091d2cdb99dd156212594ff3127850627adb4cfdcd9b1e425d480
 
 # The store is staged into eight directories by scripts/stage-layers.sh so
 # that no single image layer exceeds the 5 GiB the Cloudflare registry accepts.
