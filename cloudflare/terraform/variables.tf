@@ -3,34 +3,14 @@ variable "account_id" {
   description = "Cloudflare account ID that owns the Worker and the container."
 }
 
-variable "manage_zone" {
-  type        = bool
-  default     = false
-  description = <<-EOT
-    Create the zone in this Cloudflare account. Leave it false when the zone is
-    already there — it is then looked up by zone_name. Creating the zone does not
-    move the domain's registration; after the first apply, point the domain's
-    nameservers at the ones in the `name_servers` output.
-  EOT
-}
-
-variable "zone_id" {
-  type        = string
-  default     = ""
-  description = <<-EOT
-    Pin the zone by ID instead of looking it up by name. Rarely needed. Ignored
-    when manage_zone is true.
-  EOT
-}
-
-variable "zone_name" {
-  type        = string
-  description = "Zone apex, e.g. egpl.dev."
-}
-
 variable "hostname" {
   type        = string
-  description = "Hostname the endpoint and the landing page answer on, e.g. ja-dbpedia.egpl.dev. Must be inside zone_name."
+  default     = "ja-dbpedia.egpl.dev"
+  description = <<-EOT
+    Hostname the endpoint and the landing page answer on. Only the outputs use
+    it: the egpl.dev repository attaches it to the Worker
+    (terraform/workers.tf) and holds the zone's rules for it.
+  EOT
 }
 
 variable "enable_workers_dev" {
@@ -39,12 +19,13 @@ variable "enable_workers_dev" {
   description = <<-EOT
     Also serve the Worker on its *.workers.dev hostname.
 
-    Useful before the zone's nameservers have moved, and as the equivalent of a
+    Useful before the hostname is attached, and as the equivalent of a
     *.pages.dev URL. Understand what it costs: workers.dev is not a zone you
-    own, so none of the rules in security.tf apply to it — no WAF rules, no
-    zone rate limiting, no URL normalization. The Worker's own rate limiting
-    bindings and query checks are all that is left, and the hostname is a
-    second, unfiltered door to the same container. Leave it off in production.
+    own, so none of the zone's rules (terraform/security.tf in the egpl.dev
+    repository) apply to it — no WAF rules, no zone rate limiting, no URL
+    normalization. The Worker's own rate limiting bindings and query checks
+    are all that is left, and the hostname is a second, unfiltered door to the
+    same container. Leave it off in production.
   EOT
 }
 
@@ -67,9 +48,9 @@ variable "suspended" {
     Retire the mirror without tearing the stack down. The container application
     is deleted, which stops every instance and its billing, and the Worker
     serves a notice pointing at the official endpoint (https://ja.dbpedia.org/sparql)
-    on / and a 503 on /sparql. The zone, the custom domain and the Durable
-    Object class stay, so setting this back to false brings the mirror back
-    with a plain apply.
+    on / and a 503 on /sparql. The Durable Object class stays, and so does the
+    hostname attached from the egpl.dev repository, so setting this back to
+    false brings the mirror back with a plain apply.
   EOT
 }
 
@@ -199,8 +180,9 @@ variable "max_query_bytes" {
 #
 # These are the Workers rate limiting bindings: no extra cost, but the counters
 # are per Cloudflare location, so the effective global limit is higher than the
-# number configured here. The zone-level rule in security.tf is the blunt
-# instrument that catches a flood before it reaches the Worker at all.
+# number configured here. The zone-level rule (terraform/security.tf in the
+# egpl.dev repository) is the blunt instrument that catches a flood before it
+# reaches the Worker at all.
 
 variable "rate_limit_burst" {
   type        = number
@@ -218,42 +200,4 @@ variable "rate_limit_heavy" {
   type        = number
   default     = 10
   description = "Requests per 60 s per IP, per colo, for queries with no LIMIT or with an aggregate/regex."
-}
-
-variable "zone_rate_limit_requests" {
-  type        = number
-  default     = 50
-  description = "Zone-level rate limiting rule: requests per 10 s per IP, per colo, before the rule blocks."
-}
-
-variable "zone_rate_limit_mitigation_timeout" {
-  type        = number
-  default     = 10
-  description = <<-EOT
-    How long the block lasts once the zone rate limit trips, in seconds. The
-    Free plan only allows 10; Pro allows up to an hour, Business up to a day.
-  EOT
-}
-
-# --- Optional pieces ---------------------------------------------------------
-
-variable "enable_zone_rules" {
-  type        = bool
-  default     = true
-  description = <<-EOT
-    Manage the zone-level WAF and rate limiting rulesets. Set to false if
-    something else already owns those phases on this zone — a ruleset resource
-    takes over the whole phase and would drop rules it does not know about.
-  EOT
-}
-
-variable "blocked_paths_expression" {
-  type        = string
-  default     = "(http.request.uri.path in {\"/update\" \"/store\"} or starts_with(http.request.uri.path, \"/store/\"))"
-  description = <<-EOT
-    Requests blocked at the edge. Oxigraph's own /update and /store endpoints are
-    never reachable through the Worker, but blocking them at the zone keeps a
-    stray route or a future misconfiguration from exposing them: a bare
-    GET /store streams the entire dataset.
-  EOT
 }

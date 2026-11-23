@@ -160,8 +160,8 @@ export default {
     // The cache lookup comes before the rate limits on purpose. A hit costs no
     // container time, so charging for it would punish exactly the traffic this
     // mirror wants — a client polling the same query, or the editor's metadata
-    // queries on every page load. The zone-level rule in security.tf is what
-    // caps a flood of cached requests.
+    // queries on every page load. The zone-level rate limiting rule (in the
+    // egpl.dev repository) is what caps a flood of cached requests.
     const hit = await cache.match(cacheKey);
     if (hit) {
       return decorate(hit, { "x-cache": "HIT" });

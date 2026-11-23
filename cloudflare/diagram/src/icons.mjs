@@ -5,7 +5,7 @@
 // the names the package uses for its `type` prop ("workers-durable-objects").
 import { createRequire } from "node:module";
 import React from "react";
-import { renderToStaticMarkup } from "react-dom/server.js";
+import { renderToStaticMarkup } from "react-dom/server";
 
 const require = createRequire(import.meta.url);
 const components = require("@cloudflare/component-icon/lib/reactsvgs").default;

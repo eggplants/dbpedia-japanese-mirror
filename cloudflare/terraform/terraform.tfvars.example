@@ -1,11 +1,7 @@
 account_id = "0123456789abcdef0123456789abcdef"
-zone_name  = "egpl.dev"
-hostname   = "ja-dbpedia.egpl.dev"
 
-# Is DNS zone managed by Cloudflare?
-manage_zone = false
-# Existing hosted zone ID
-# zone_id = "fedcba9876543210fedcba9876543210"
+# Attached to the Worker from the egpl.dev repository; here only for the outputs
+hostname = "ja-dbpedia.egpl.dev"
 
 source_repository = "https://github.com/eggplants/dbpedia-japanese-mirror"
 
@@ -40,7 +36,3 @@ container_pool_size     = 1
 rate_limit_burst     = 30
 rate_limit_sustained = 120
 rate_limit_heavy     = 10
-
-# Zone-level ceiling, counted per 10 s. On the Free plan mitigation_timeout has to be 10.
-zone_rate_limit_requests           = 50
-zone_rate_limit_mitigation_timeout = 10

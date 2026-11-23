@@ -8,25 +8,6 @@ output "landing_page" {
   description = "The query editor and the unofficial-mirror notice."
 }
 
-output "zone_id" {
-  value       = local.zone_id
-  description = "The zone the endpoint is published under, whichever way it was resolved."
-}
-
-output "name_servers" {
-  value       = var.manage_zone ? one(cloudflare_zone.this[*].name_servers) : one(data.cloudflare_zone.this[*].name_servers)
-  description = <<-EOT
-    Nameservers to set at the domain's registrar when Terraform created the zone.
-    The zone stays pending until the delegation is in place, and the Workers
-    custom domain will not issue a certificate before that.
-  EOT
-}
-
-output "zone_status" {
-  value       = var.manage_zone ? one(cloudflare_zone.this[*].status) : one(data.cloudflare_zone.this[*].status)
-  description = "\"active\" once Cloudflare sees itself as authoritative for the zone."
-}
-
 output "workers_dev_url" {
   value       = var.enable_workers_dev ? cloudflare_worker.sparql.subdomain.url : null
   description = "The *.workers.dev address, when enable_workers_dev is true. None of the zone rules apply to it."

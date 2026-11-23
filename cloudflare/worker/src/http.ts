@@ -9,9 +9,9 @@
  *
  * Cloudflare's "Normalize incoming URLs" setting removes those dot segments
  * before the WAF, rate limiting rules and the Worker ever see them, and it
- * defaults to on (terraform/security.tf pins it). This module exists so that the
- * Worker is right regardless: one exact spelling per route, whatever the zone
- * setting happens to be.
+ * defaults to on (terraform/security.tf in the egpl.dev repository pins it).
+ * This module exists so that the Worker is right regardless: one exact spelling
+ * per route, whatever the zone setting happens to be.
  */
 
 /**

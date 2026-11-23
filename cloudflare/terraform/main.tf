@@ -13,8 +13,9 @@ resource "cloudflare_worker" "sparql" {
   }
 
   # The workers.dev hostname answers without passing through any of the zone
-  # rules in security.tf, so it is off unless asked for. Preview URLs are the
-  # same hole with a version prefix, and stay off either way.
+  # rules (terraform/security.tf in the egpl.dev repository), so it is off
+  # unless asked for. Preview URLs are the same hole with a version prefix, and
+  # stay off either way.
   subdomain = {
     enabled          = var.enable_workers_dev
     previews_enabled = false
@@ -196,12 +197,6 @@ resource "cloudflare_workers_deployment" "sparql" {
   }
 }
 
-resource "cloudflare_workers_custom_domain" "sparql" {
-  account_id = var.account_id
-  zone_id    = local.zone_id
-  zone_name  = var.zone_name
-  hostname   = var.hostname
-  service    = cloudflare_worker.sparql.name
-
-  depends_on = [cloudflare_workers_deployment.sparql]
-}
+# The hostname is attached to this Worker from the egpl.dev repository
+# (terraform/workers.tf), which owns everything in the zone. Apply this first
+# when setting up from scratch, and detach the hostname there before a destroy.

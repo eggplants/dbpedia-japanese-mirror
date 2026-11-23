@@ -4,11 +4,12 @@
 //   terraform graph  ->  architecture.mmd  ->  architecture.svg
 //
 // The resources and the edges between them come from `terraform graph`, which
-// needs `terraform init` but no credentials: it is built from the configuration
-// alone. Edges are Terraform dependencies, drawn the same way round as in the
+// is built from the configuration alone and needs no Cloudflare credentials,
+// only `terraform init` and the R2 credentials in ../.env that the backend
+// asks for. Edges are Terraform dependencies, drawn the same way round as in the
 // graph: from the resource that refers to another to the one it refers to, so
-// the custom domain points at the deployment it routes to, the deployment at
-// the version it serves, and so on. What each resource looks like is decided
+// the deployment points at the version it serves, the version at the Durable
+// Object class it binds, and so on. What each resource looks like is decided
 // in resources.mjs.
 //
 // The .mmd is committed as the readable source, but it cannot be rendered by
@@ -190,7 +191,7 @@ async function render(definition) {
       // re-running with no change to the configuration leaves no diff.
       mermaidConfig: { handDrawnSeed: 1, flowchart: { htmlLabels: false } },
       // mermaid-cli fetches icon packs by URL; a data: URL keeps it offline.
-      iconPacksNamesAndUrls: [`${PREFIX}#data:application/json;base64,${pack}`],
+      iconPacks: { [PREFIX]: new URL(`data:application/json;base64,${pack}`) },
     });
     return stabilizeIds(Buffer.from(data).toString("utf8"));
   } finally {

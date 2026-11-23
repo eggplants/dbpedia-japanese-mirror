@@ -8,17 +8,10 @@
 // Icon names are the `type` values of @cloudflare/component-icon; the full
 // list is in its dist/Icon.d.ts.
 
-// Boxes. A group that `represents` resources stands in for them: the zone is
-// drawn as the box the zone-level resources sit in, not as a node of its own,
-// and the resource's dependency edges to the members of its box are implied by
-// the box. The data source and the managed resource are the same zone, only
-// one of them exists at a time (see zone.tf).
+// Boxes. A group that `represents` resources stands in for them: it is drawn
+// as the box its members sit in, not as a node of its own, and the resource's
+// dependency edges to the members of its box are implied by the box.
 export const groups = [
-  {
-    id: "zone",
-    label: "Zone",
-    represents: ["cloudflare_zone.this", "data.cloudflare_zone.this"],
-  },
   {
     id: "workers",
     label: "Workers",
@@ -27,26 +20,6 @@ export const groups = [
 
 // Resources, in the order they are listed within their box.
 export const resources = {
-  "cloudflare_workers_custom_domain.sparql": {
-    group: "zone",
-    icon: "reliability-dns",
-    label: "Custom domain",
-  },
-  "cloudflare_url_normalization_settings.this": {
-    group: "zone",
-    icon: "cloudflare-ruleset-engine",
-    label: "URL normalization",
-  },
-  "cloudflare_ruleset.firewall": {
-    group: "zone",
-    icon: "security-waf",
-    label: "WAF custom rules",
-  },
-  "cloudflare_ruleset.ratelimit": {
-    group: "zone",
-    icon: "reliability-timer-outline",
-    label: "Rate limiting",
-  },
   "cloudflare_worker.sparql": {
     group: "workers",
     icon: "workers-bundled",
@@ -76,14 +49,22 @@ export const resources = {
 
 export const fallback = { icon: "terraform" };
 
-// Nodes that are not Terraform resources but make the picture readable: where
-// the traffic comes from. `to` is the resource address it points at.
+// Nodes that are not Terraform resources here but make the picture readable:
+// where the traffic comes from, and the hostname the egpl.dev repository
+// attaches to the Worker together with the zone's rules. `to` is the resource
+// address or the extra's id it points at.
 export const extras = [
   {
     id: "client",
     icon: "user",
     form: "circle",
     label: "Client",
-    to: "cloudflare_workers_custom_domain.sparql",
+    to: "egpl_dev",
+  },
+  {
+    id: "egpl_dev",
+    icon: "reliability-dns",
+    label: "ja-dbpedia.egpl.dev<br/>custom domain and zone rules<br/>eggplants/egpl.dev/terraform",
+    to: "cloudflare_worker.sparql",
   },
 ];

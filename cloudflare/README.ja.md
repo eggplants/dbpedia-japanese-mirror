@@ -19,7 +19,7 @@ flowchart TD
 
     subgraph cf["Cloudflare"]
         direction TB
-        edge["WAF カスタムルール<br/>ゾーンのレート制限"]
+        edge["ja-dbpedia.egpl.dev（egpl.dev リポジトリ）<br/>カスタムドメイン・WAF カスタムルール<br/>ゾーンのレート制限"]
         worker["Worker"]
         page["/<br/>エディタ＋非公式ミラーの告知"]
         sparql["/sparql<br/>1. SPARQL Update と SERVICE を拒否<br/>2. クエリのハッシュを鍵に Cache API<br/>3. miss のときだけ IP 単位のレート制限"]
@@ -37,12 +37,14 @@ flowchart TD
     build -.->|"terraform apply"| cf
 ```
 
-![Terraform のリソース。ゾーンにはカスタムドメイン、URL 正規化、WAF とレート制限のルールセット。Workers には Worker、その Durable Object クラス、バージョン、デプロイ、コンテナ](diagram/architecture.svg)
+![Terraform のリソース。Workers には Worker、その Durable Object クラス、バージョン、デプロイ、コンテナ。その手前に egpl.dev リポジトリが付けるホスト名](diagram/architecture.svg)
+
+この Terraform が扱うのは、アカウントに属するものだけです。ホスト名 `ja-dbpedia.egpl.dev` と、それに対するゾーンの WAF・レート制限のルールは、`egpl.dev` ゾーンを持つ [eggplants/egpl.dev](https://github.com/eggplants/egpl.dev) にあります (`terraform/workers.tf`、`terraform/security.tf`)。state はそのリポジトリの R2 バケットに `dbpedia-japanese-mirror/terraform.tfstate` として置きます。
 
 ## 前提
 
 - **Workers Paid** プランの Cloudflare アカウント
-- 公開ホスト名のドメインが同じアカウントのゾーンとして登録され、ネームサーバが Cloudflare を向いていること
+- R2 バケット `terraform-state`（egpl.dev リポジトリの `scripts/create-state-bucket.sh` で作る）
 - [mise](https://mise.jdx.dev/) / Docker / `curl` / `jq`
 - `../docker-compose/store/db` にロード済みのストアがあること
   - `cd ../docker-compose && docker compose up --build`
@@ -53,7 +55,7 @@ flowchart TD
 cd cloudflare
 mise trust
 cf auth login
-scripts/create-api-token.sh <account id> <zone id> # .env に書き込む
+scripts/create-api-token.sh <account id> # トークンと R2 の認証情報を .env に書き込む
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 $EDITOR terraform/terraform.tfvars
 
@@ -63,6 +65,7 @@ mise run init
 mise run plan
 
 mise run deploy
+# 初回だけ、続けて egpl.dev リポジトリでホスト名を付ける
 
 time rqw -e https://ja-dbpedia.egpl.dev/sparql -Q 'SELECT ?o WHERE {
   <http://ja.dbpedia.org/resource/日本> <http://www.w3.org/2000/01/rdf-schema#label> ?o
@@ -94,9 +97,11 @@ mise run deploy # イメージのタグは DUMP_VERSION
 
 ### 一時停止
 
-`terraform/terraform.tfvars` で `suspended = true` にして `mise run apply` すると、コンテナアプリケーションを削除してインスタンスを止め、`/` では公式エンドポイント (<https://ja.dbpedia.org/sparql>) への案内ページを、`/sparql` では 503 を返すようになります。ゾーン・カスタムドメイン・Durable Object クラスは残るので、`suspended = false` に戻して `mise run apply` すれば再開できます。
+`terraform/terraform.tfvars` で `suspended = true` にして `mise run apply` すると、コンテナアプリケーションを削除してインスタンスを止め、`/` では公式エンドポイント (<https://ja.dbpedia.org/sparql>) への案内ページを、`/sparql` では 503 を返すようになります。Durable Object クラスと、egpl.dev リポジトリが付けたホスト名は残るので、`suspended = false` に戻して `mise run apply` すれば再開できます。
 
 ### 撤去
+
+先に egpl.dev リポジトリでホスト名を外し (`terraform/workers.tf`)、それから次を実行します。
 
 ```bash
 mise run destroy

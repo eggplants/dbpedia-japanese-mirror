@@ -19,7 +19,7 @@ flowchart TD
 
     subgraph cf["Cloudflare"]
         direction TB
-        edge["WAF custom rules<br/>zone rate limiting"]
+        edge["ja-dbpedia.egpl.dev (egpl.dev repository)<br/>custom domain, WAF custom rules<br/>zone rate limiting"]
         worker["Worker"]
         page["/<br/>editor + unofficial mirror notice"]
         sparql["/sparql<br/>1. reject SPARQL Update and SERVICE<br/>2. Cache API, keyed by the query hash<br/>3. rate limit per IP only on a miss"]
@@ -37,12 +37,14 @@ flowchart TD
     build -.->|"terraform apply"| cf
 ```
 
-![The Terraform resources: the custom domain, URL normalization, WAF and rate-limit rulesets in the zone; the Worker, its Durable Object class, version, deployment and container in Workers](diagram/architecture.svg)
+![The Terraform resources: the Worker, its Durable Object class, version, deployment and container in Workers, behind the hostname the egpl.dev repository attaches](diagram/architecture.svg)
+
+This Terraform manages only what lives in the account. The hostname `ja-dbpedia.egpl.dev`, and the zone's WAF and rate limiting rules for it, are in [eggplants/egpl.dev](https://github.com/eggplants/egpl.dev) (`terraform/workers.tf`, `terraform/security.tf`), which owns the `egpl.dev` zone. The state lives in that repository's R2 bucket, under `dbpedia-japanese-mirror/terraform.tfstate`.
 
 ## Requirements
 
 - A Cloudflare account on the **Workers Paid** plan
-- The endpoint's domain registered as a zone in that same account, with its nameservers pointing at Cloudflare
+- The R2 bucket `terraform-state`, made by `scripts/create-state-bucket.sh` in the egpl.dev repository
 - [mise](https://mise.jdx.dev/) / Docker / `curl` / `jq`
 - A loaded store under `../docker-compose/store/db`
   - `cd ../docker-compose && docker compose up --build`
@@ -50,7 +52,7 @@ flowchart TD
 | Scope | Permission |
 | --- | --- |
 | Account | Workers Scripts Write, Workers Containers Write |
-| Zone | Zone Read, Zone Settings Write, Sanitize Write (URL normalization), Firewall Services Write, Zone WAF Write, DNS Write, Workers Routes Write |
+| R2 bucket `terraform-state` | Workers R2 Storage Bucket Item Write |
 
 ## Quickstart
 
@@ -58,7 +60,7 @@ flowchart TD
 cd cloudflare
 mise trust
 cf auth login
-scripts/create-api-token.sh <account id> <zone id> # writes .env
+scripts/create-api-token.sh <account id> # writes the token and the R2 credentials to .env
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 $EDITOR terraform/terraform.tfvars
 
@@ -68,6 +70,7 @@ mise run init
 mise run plan
 
 mise run deploy
+# then attach the hostname from the egpl.dev repository, the first time only
 
 # check
 time rqw -e https://ja-dbpedia.egpl.dev/sparql -Q 'SELECT ?o WHERE {
@@ -100,9 +103,11 @@ mise run deploy # the image is tagged with DUMP_VERSION
 
 ### Suspending the mirror
 
-Set `suspended = true` in `terraform/terraform.tfvars` and run `mise run apply`. The container application is deleted, which stops its instances, and the Worker answers `/` with a notice pointing at the official endpoint (<https://ja.dbpedia.org/sparql>) and `/sparql` with a 503. The zone, the custom domain and the Durable Object class stay, so setting `suspended = false` and applying again brings the mirror back.
+Set `suspended = true` in `terraform/terraform.tfvars` and run `mise run apply`. The container application is deleted, which stops its instances, and the Worker answers `/` with a notice pointing at the official endpoint (<https://ja.dbpedia.org/sparql>) and `/sparql` with a 503. The Durable Object class stays, and so does the hostname attached from the egpl.dev repository, so setting `suspended = false` and applying again brings the mirror back.
 
 ### Teardown
+
+Detach the hostname in the egpl.dev repository first (`terraform/workers.tf`), then:
 
 ```bash
 mise run destroy
