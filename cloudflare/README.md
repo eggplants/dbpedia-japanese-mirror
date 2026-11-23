@@ -88,6 +88,7 @@ $EDITOR .env # DUMP_VERSION=<new version>
 docker compose up -d download && docker compose up load
 
 cd ../cloudflare
+$EDITOR mise.toml # DUMP_VERSION in [env], the same version
 mise run deploy # the image is tagged with DUMP_VERSION
 ```
 

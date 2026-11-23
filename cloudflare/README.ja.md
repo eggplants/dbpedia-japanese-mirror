@@ -82,6 +82,7 @@ $EDITOR .env # DUMP_VERSION=<新しい版>
 docker compose up -d download && docker compose up load
 
 cd ../cloudflare
+$EDITOR mise.toml # [env] の DUMP_VERSION を同じ版に
 mise run deploy # イメージのタグは DUMP_VERSION
 ```
 

@@ -11,15 +11,6 @@ suspended = false
 # Use *.workers.dev domain
 enable_workers_dev = false
 
-# Must match DUMP_VERSION in docker-compose/.env
-dataset_version = "20221201"
-
-# Must match DUMP_PROFILE in docker-compose/.env
-dataset_profile = "core"
-
-# Pushed by `make push`; the tag is DUMP_VERSION by default
-container_image = "dbpedia-ja-oxigraph:20221201"
-
 # Sizing. Measured at 114 bytes/triple in the default graph and roughly twice
 # that in a named graph; the core profile is around 54M triples and unpacks to
 # about 16.3 GB on disk. Serving needs very little memory (64 MB RSS on a

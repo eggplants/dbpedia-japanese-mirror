@@ -21,8 +21,8 @@ minimum_release_age = "7d"
 
 [env]
 _.file = ".env"
-DUMP_VERSION = "{{ exec(command='echo ${DUMP_VERSION:-$(sed -n s/^DUMP_VERSION=//p ../docker-compose/.env 2>/dev/null | tail -n1)}') }}"
-DUMP_PROFILE = "{{ exec(command='echo ${DUMP_PROFILE:-$(sed -n s/^DUMP_PROFILE=//p ../docker-compose/.env 2>/dev/null | tail -n1)}') }}"
+DUMP_VERSION = "{{ get_env(name='DUMP_VERSION', default='20221201') }}"
+DUMP_PROFILE = "{{ get_env(name='DUMP_PROFILE', default='core') }}"
 STORE_DIR = "{{ get_env(name='STORE_DIR', default='../docker-compose/store') }}"
 IMAGE_NAME = "{{ get_env(name='IMAGE_NAME', default='dbpedia-ja-oxigraph') }}"
 IMAGE_TAG = "{{ get_env(name='IMAGE_TAG', default=env.DUMP_VERSION) }}"
@@ -37,7 +37,7 @@ run = '''
 set -euo pipefail
 if [[ -z "${DUMP_VERSION}" ]]; then
   echo "[ERROR] DUMP_VERSION is empty." >&2
-  echo "        Set it in ../docker-compose/.env, or run with DUMP_VERSION=... mise run <task>" >&2
+  echo "        Set it in mise.toml, or run with DUMP_VERSION=... mise run <task>" >&2
   exit 1
 fi
 '''
@@ -54,6 +54,16 @@ if [[ ! -d "${STORE_DIR}/db" ]]; then
   echo "        Build it first: cd ../docker-compose && docker compose up load" >&2
   exit 1
 fi
+# The store was loaded with ../docker-compose/.env; an image tagged with any
+# other version would carry the wrong data under that version's name.
+for key in DUMP_VERSION DUMP_PROFILE; do
+  loaded="$(sed -n "s/^${key}=//p" ../docker-compose/.env 2>/dev/null | tail -n1 || true)"
+  if [[ -n "${loaded}" && "${loaded}" != "${!key}" ]]; then
+    echo "[ERROR] ${key} is ${!key} here but ${loaded} in ../docker-compose/.env." >&2
+    echo "        Make them agree in mise.toml before baking the image." >&2
+    exit 1
+  fi
+done
 echo "[INFO] Store: ${STORE_DIR}/db ($(du -sh "${STORE_DIR}/db" | cut -f1))"
 '''
 
